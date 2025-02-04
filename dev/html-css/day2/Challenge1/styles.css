@@ -1,0 +1,64 @@
+body {
+    background-color: #b7cee9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family:'Inter',sans-serif;
+}
+
+.google-card {
+    border-radius: 20px;
+    background-color: #D9E5F3;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    text-align: center;
+    padding: 40px 20px;
+    width: 250px;
+}
+
+.google-img {
+    width: 80px;
+    margin-bottom: 20px
+}
+
+h2 {
+    font-size: 24px;
+    font-weight: bold;
+    color: #000;
+    margin: 10px 0 5px 0;
+}
+
+p {
+    font-size: 14px;
+    color: gray;
+    margin-bottom: 20px;
+}
+
+.icons a{
+    margin-bottom: 20px;
+    padding: 5px;
+    font-size: 20px;
+    color: #000;
+    text-decoration: none;
+    transition: transform 0.3s;
+}
+.icons img{
+    background: none;
+    border: none;
+    width: 20px;
+    height: 20px;
+}
+
+button {
+    background-color: #FFFFFF;
+    border-radius: 20px;
+    padding: 10px 20px;
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    margin-top: 20px;
+}
