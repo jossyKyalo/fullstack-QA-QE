@@ -1,0 +1,24 @@
+{
+  "name": "0.basics",
+  "version": "1.0.0",
+  "description": "Learnin JS Basics",
+  "main": "basics.js",
+  "type":"module",
+  "scripts": {
+    "test": "jest",
+    "dev:start": "nodemon basics.js"
+  },
+  "keywords": [
+    "jest",
+    "js",
+    "ts"
+  ],
+  "author": "emma",
+  "license": "ISC",
+  "dependencies": {
+    "chalk": "^5.4.1",
+    "nodemon": "^3.1.9"
+  },
+  
+  "type": "module"
+}
