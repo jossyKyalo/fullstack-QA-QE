@@ -11,7 +11,7 @@ body {
 .google-card {
     border-radius: 20px;
     background-color: #D9E5F3;
-    box-shadow:3px 3px rgba(118, 169, 189, 0.1);
+    box-shadow:-40px 2px 20px -15px rgba(100, 149, 237, 0.4);
     backdrop-filter: blur(10px);
     text-align: center;
     padding: 40px 20px;
