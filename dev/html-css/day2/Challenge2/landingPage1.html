@@ -5,225 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout Page</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-        }
-
-        body {
-            background-color: #f9fafb;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        header {
-            background-color: #fff;
-            padding: 1rem;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .centerNav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .endNav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        nav {
-            display: flex;
-            gap: 12rem;
-            align-items: center;
-        }
-
-        a {
-            text-decoration: none;
-            color: black;
-            font-weight: bold;
-        }
-
-        .checkout-steps {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin: 2rem 0;
-        }
-
-        .step {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .step-number {
-            width: 2rem;
-            height: 2rem;
-            border-radius: 50%;
-            background-color: #e5e7eb;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .step.active .step-number {
-            background-color: #1a56db;
-            color: white;
-        }
-
-        .checkout-content {
-            display: flex;
-            gap: 2rem;
-        }
-
-        .form-section {
-            flex: 1;
-            background-color: rgb(135, 189, 240, 0.2);
-            padding: 2rem;
-            border-radius: 0.5rem;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: #374151;
-        }
-
-        input {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #d1d5db;
-            border-radius: 0.375rem;
-            background-color: rgb(182, 180, 180);
-        }
-        .no-border{
-            border:none;
-            background: none;
-        }
-
-        .button-group {
-            display: flex;
-            justify-content: space-between;
-            gap: 1rem;
-        }
-
-
-        .order-summary {
-            width: 400px;
-            background-color:rgb(135, 189, 240, 0.2);
-            padding: 2rem;
-            border-radius: 0.5rem;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-
-        .summary-item,
-        .total {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 1rem;
-        }
-
-        .product-img {
-            width: 100%;
-            max-width: 150px;
-        }
-
-        .quantity-control {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .quantity-control button {
-            width: 30px;
-            height: 30px;
-            background-color: rgb(182, 180, 180);
-            color: black;
-            border:none;
-            border-radius: 5px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .quantity-control span {
-            border: none;
-        }
-        .order-summary .form-group {
-            margin-bottom: 1.5rem;  
-        }
-        .order-summary input[type="text"] {
-            width: calc(100% - 60px);  
-            padding: 0.75rem;
-            border: 1px solid #d1d5db;
-            border-radius: 0.375rem;
-            margin-right: 0.5rem; 
-            background-color: rgb(182, 180, 180); 
-        }
-        .login-btn, .shipping-btn {
-            padding: 0.75rem 1rem;  
-            background-color: #1a56db;
-            color: white;
-            border: none;
-            border-radius: 0.375rem;
-            cursor: pointer;
-        }
-
-        .summary-item, .total ,#form-group{
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 1rem;
-        }
-        .total {
-            font-weight: bold;
-            padding-top: 1rem;
-        }
-        .apply-btn{
-            padding: 0.75rem 1rem;  
-            background-color: #fff;
-            color:#1a56db ;
-            border: 2px solid#1a56db;
-            border-radius: 0.375rem;
-            cursor: pointer;
-        }
-        .order-summary img {
-            max-width: 100%;  
-            height: auto;
-            margin-bottom: 1rem;
-            background-color: gray;
-        }
-
-        @media (max-width: 768px) {
-            .checkout-content {
-                flex-direction: column;
-            }
-
-            .order-summary img {
-                width: 100%;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap">
 </head>
 
 <body>
@@ -240,32 +24,34 @@
             </div>
             <div class="endNav">
                 <div>Account ▼</div>
-                <div>3 items 🛒</div>
+                <div><img src="./images/lock.png" style="width:16px; height:16px;">3 items </div>
                 <img src="./images/profilePic.png" style="width: 40px; height:40px; border-radius:50%;">
             </div>
         </nav>
     </header>
 
     <main class="container">
-        <div class="checkout-steps">
-            <div class="step active">
-                <div class="step-number">1</div>
-                <div>Account</div>
-            </div>
-            <div class="step">
-                <div class="step-number">2</div>
-                <div>Shipping</div>
-            </div>
-            <div class="step">
-                <div class="step-number">3</div>
-                <div>Payment</div>
-            </div>
-        </div>
-
         <div class="checkout-content">
             <div class="form-section">
-                <h2>Account Details</h2>
+                <h3 style="margin-bottom: 20px;">Account details</h3>
                 <form>
+                    <div class="checkout-steps">
+                        <div class="step active">
+                            <div style="color:rgb(28, 148, 240);">Account</div>
+                            <div class="step-number"></div>
+                            <span class="circle checked">✔</span>
+                        </div>
+                        <div class="step">
+                            <div>Shipping</div>
+                            <div class="step-number"></div>
+                            <span class="circle checked">✔</span>
+                        </div>
+                        <div class="step">
+                            <div class="step-number"></div>
+                            <span class="circle checked">✔</span>
+                            <div>Payment</div>
+                        </div>
+                    </div>
                     <div class="form-group">
                         <label for="email">Email Address</label>
                         <input type="email" id="email" placeholder="Email@myemail.com" required>
@@ -275,24 +61,27 @@
                         <input type="password" id="password" placeholder="***********" required>
                     </div>
                     <div class="button-group">
-                        <button type="button" style="border:none;"  class="no-border">Register for Account</button>
+                        <button type="button" style="border:none;" class="no-border">Register for Account</button>
                         <button type="submit" class="login-btn">Login</button>
                     </div>
+                    <hr>
                     <div class="button-group">
                         <button type="button" style="border:none;" class="no-border">Cancel Order</button>
-                        <button type="button" class="shipping-btn">Shipping Details</button>
+                        <button type="button" class="shipping-btn">Shipping details</button>
                     </div>
                 </form>
             </div>
 
             <div class="order-summary">
-                <h2>Order Summary</h2>
-                <img src="./images/headphones.png" alt="Sony wireless headphones" class="product-img">
-                <div class="quantity-control">Sony wireless headphones <button>-</button>
+                <h3 style="margin-bottom: 20px;">Order Summary</h3>
+                <img src="./images/image.png" alt="Sony wireless headphones" class="product-img">
+                <div class="quantity-control" style="font-weight: bold;">Sony wireless headphones <button>-</button>
                     <span>1</span>
-                    <button>+</button></div>
-                <div style="font-weight: bold;">
-                    <span>£316.55</span>
+                    <button>+</button>
+                </div>
+                <div>
+                    <span style="font-weight: bold;">£320.45</span><br><br>
+                    <p style="color: gray;">Gift Card/Discount code</p><br>
                 </div>
                 <div class="form-group" id="form-group">
                     <span><input type="text"></span>
@@ -308,11 +97,11 @@
                 </div>
                 <div class="summary-item">
                     <span>Shipping</span>
-                    <span>Free</span>
+                    <span style="color:rgb(28, 148, 240);">Free</span>
                 </div>
                 <div class="total">
                     <strong>Total</strong>
-                    <strong>£320.45</strong>
+                    <p style="font-weight: lighter;">£320.45</p>
                 </div>
             </div>
         </div>
