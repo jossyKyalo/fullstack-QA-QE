@@ -3,41 +3,48 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    width: 100vw;
     height: 100vh;
     margin: 0;
     font-family:'Inter',sans-serif;
 }
 
 .google-card {
-    border-radius: 20px;
-    background-color: #D9E5F3;
-    box-shadow:-40px 2px 20px -15px rgba(100, 149, 237, 0.4);
-    backdrop-filter: blur(10px);
+    background:#D9E5F3;
+    box-shadow: 15px -15px 25px rgba(43, 56, 228, 0.12),   
+               -15px 15px 25px rgba(43, 56, 228, 0.12);
+     
+    backdrop-filter: blur(5px);
+    transition: box-shadow 300ms ease-in-out, transform 300ms ease-in-out;
+    border-radius: 30px;
+    z-index: 1;
     text-align: center;
     padding: 40px 20px;
-    width: 250px;
+    width: 270px;
+    height: 370px;
 }
 
 .google-img {
     width: 80px;
-    margin-bottom: 20px
+    margin-bottom: 30px;
+    margin-top: 40px;
 }
 
 h2 {
     font-size: 24px;
     font-weight: bold;
     color: #000;
-    margin: 10px 0 5px 0;
+    margin: 10px 0 10px 0;
 }
 
 p {
     font-size: 14px;
     color: gray;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
 }
 
 .icons a{
-    margin-bottom: 20px;
+    margin-bottom: 40px;
     padding: 5px;
     font-size: 20px;
     color: #000;
@@ -60,5 +67,5 @@ button {
     cursor: pointer;
     font-size: 14px;
     font-weight: bold;
-    margin-top: 20px;
+    margin-top: 40px;
 }
