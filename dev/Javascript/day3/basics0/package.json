@@ -6,7 +6,7 @@
   "type":"module",
   "scripts": {
     "test": "jest",
-    "dev:start": "nodemon basics.js"
+    "dev:start": "nodemon ./day4/strings.js"
   },
   "keywords": [
     "jest",
