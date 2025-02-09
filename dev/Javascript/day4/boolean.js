@@ -23,7 +23,7 @@ console.log(hashedPassword)
 //comparing the passwords
 const comparedPasswords=bcrypt.compareSync(password, hashedPassword)
 function authLogin(){
-    if (comparedPasswords)){
+    if (comparedPasswords){
         //show payment details
         console.log("Login successful");
     }
