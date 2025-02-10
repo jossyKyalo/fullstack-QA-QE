@@ -1,0 +1,23 @@
+{
+  "name": "BooleanAssignment",
+  "version": "1.0.0",
+  "description": "Learnin JS Basics",
+  "main": "booleanAssignment.js",
+  "type": "module",
+  "scripts": {
+    "test": "jest",
+    "dev:start": "nodemon booleanAssignment.js"
+  },
+  "keywords": [
+    "jest",
+    "js",
+    "ts"
+  ],
+  "author": "emma",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "chalk": "^5.4.1",
+    "nodemon": "^3.1.9"
+  }
+}
