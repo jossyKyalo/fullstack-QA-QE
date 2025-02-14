@@ -51,5 +51,33 @@ const users = [
       ]
     }
   ];
-  
+  function analyzeSocialMediaData(users) {
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+     
+    const activeUsers = users.filter(user =>
+        user.posts.some(post => new Date(post.timestamp) >= oneWeekAgo)
+    );
+
+ 
+    const popularPosts = activeUsers.flatMap(user =>
+        user.posts.filter(post => post.likes >= 10)
+    );
+
+ 
+    const totalLikes = popularPosts.reduce((sum, post) => sum + post.likes, 0);
+    const averageLikes = activeUsers.length > 0 ? totalLikes / activeUsers.length : 0;
+
+ 
+    return {
+        activeUsersCount: activeUsers.length,
+        totalPopularPosts: popularPosts.length,
+        averageLikesPerUser: averageLikes.toFixed(2)
+    };
+}
+
+ 
+console.log(analyzeSocialMediaData(users));
+
   
