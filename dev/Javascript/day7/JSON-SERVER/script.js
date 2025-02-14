@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     const productList = document.getElementById("product-list");
+    
     fetch("http://localhost:5000/products")
         .then(response => response.json())
         .then(products => {
@@ -9,9 +10,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 productDiv.innerHTML = `
                     <h2>${product.name}</h2>
-                    <p><strong>Category:</strong> ${product.category}</p>
-                    <p><strong>Price:</strong> $${product.price}</p>
-                    <p><strong>Stock:</strong> ${product.stock} units</p>
+                    <p class="product-category">${product.category}</p>
+                    <p class="product-price">Price: $${product.price.toFixed(2)}</p>
+                    <p class="product-stock">Stock: ${product.stock} units</p>
                     <p>${product.description}</p>
                 `;
 
