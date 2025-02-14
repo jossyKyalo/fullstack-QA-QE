@@ -2,11 +2,11 @@
   "name": "0.basics",
   "version": "1.0.0",
   "description": "Learnin JS Basics",
-  "main": "teach2giveArrayInterviewQuiz.js",
+  "main": "arrayMap.js",
   "type": "module",
   "scripts": {
     "test": "jest",
-    "dev:start": "nodemon teach2giveArrayInterviewQuiz.js"
+    "dev:start": "nodemon arrayMap.js"
   },
   "keywords": [
     "jest",
