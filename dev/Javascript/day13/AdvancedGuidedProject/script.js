@@ -37,12 +37,22 @@ function displayBooks(books) {
             <p><strong>Author:</strong> ${book.author}</p>
             <p><strong>Genre:</strong> ${book.genre}</p>
             <p><strong>Year:</strong> ${book.year}</p>
-            <button onclick="showBookModal('${book.title}', '${book.author}', ${book.year}')">More Info</button>
+            <button onclick="addToCart('${book.title}', '${book.image}', '${book.price}')">Buy now</button>
+            <button onclick="showBookModal('${book.title}', '${book.author}', ${book.year})">Details</button>
         `;
         bookList.appendChild(bookItem);
     });
 }
+function openModal() {
+    document.getElementById("modal").style.display = "flex";
+    document.body.classList.add("modal-open");  
+}
 
+
+function closeModal() {
+    document.getElementById("modal").style.display = "none";
+    document.body.classList.remove("modal-open");  
+}
 
 function showBookModal(title, author, year) {
     const modal = document.getElementById("modal");
@@ -55,14 +65,16 @@ function showBookModal(title, author, year) {
     }
 
     document.getElementById("modal-warning").innerText = warningMessage;
-    modal.style.display = "flex";
+    openModal();
 }
 
 
-document.querySelector(".close-btn").addEventListener("click", () => {
-    document.getElementById("modal").style.display = "none";
+document.querySelector(".close-btn").addEventListener("click",  closeModal);
+window.addEventListener("click", (event) => {
+    if (event.target === document.getElementById("modal")) {
+        closeModal();
+    }
 });
-
 // Step 2: Modify Book Data (Using Callbacks)
 function markDystopian(book) {
     if (book.genre.toLowerCase() === "dystopian") {
@@ -171,3 +183,82 @@ function handleEmptyResults(books) {
 
 
 document.addEventListener("DOMContentLoaded", () => fetchBooks());
+
+let cart = [];
+
+function addToCart(title, image, price) {
+    const existingItem = cart.find(item => item.title === title);
+    if (existingItem) {
+        existingItem.count++;
+    } else {
+        cart.push({ title, image, price:parseFloat(price) , count: 1 });
+    }
+    toggleCart();
+    updateCartDisplay();
+    updateCartCount();
+    document.body.classList.add("modal-open");
+}
+function updateCartCount() {
+    const cartCountElement = document.getElementById("cart-count");
+    const totalCount = cart.reduce((sum, item) => sum + item.count, 0); // Sum of all item counts
+    cartCountElement.textContent = totalCount;
+}
+
+function updateCartDisplay() {
+    const cartItems = document.getElementById("cart-items");
+    const totalAmount = document.getElementById("total-amount");
+
+    cartItems.innerHTML = "";
+
+    let totalPrice = 0;
+
+    cart.forEach((item, index) => {
+        totalPrice += item.price * item.count;
+        const itemElement = document.createElement("div");
+        itemElement.classList.add("cart-item");
+        itemElement.innerHTML = `
+            <img src="${item.image}" alt="${item.title}" style="width:50px; height:50px;">
+            <div>
+                <h4>${item.title}</h4>
+                <p>Price: $${item.price}</p>
+                <p>Quantity: ${item.count}</p>
+                <div class="button-container">
+                <button onclick="changeItemCount(${index}, -1)">➖</button>
+                <button onclick="changeItemCount(${index}, 1)">➕</button>
+                <button onclick="removeFromCart(${index})">❌</button>
+                </div>
+            </div>
+        `;
+        cartItems.appendChild(itemElement);
+    });
+
+    totalAmount.innerText = `Total: $${totalPrice.toFixed(2)}`;
+}
+
+function changeItemCount(index, change) {
+    if (cart[index].count + change <= 0) {
+        cart.splice(index, 1);
+    } else {
+        cart[index].count += change;
+    }
+    updateCartDisplay();
+}
+
+function removeFromCart(index) {
+    cart.splice(index, 1);
+    updateCartDisplay();
+}
+
+function toggleCart() {
+    const cartModal = document.getElementById("cart-modal");
+    if (cartModal.style.display === "flex") {
+        cartModal.style.display = "none";
+        document.body.classList.remove("modal-open"); 
+    } else {
+        cartModal.style.display = "flex";
+        document.body.classList.add("modal-open");  
+    }
+}
+
+
+
