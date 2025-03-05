@@ -4,7 +4,7 @@ import {readFileSync} from "fs"
 import path from 'path'
 import cors from 'cors'
 
-//configure dotenv
+//configure dotenv---top most level
 dotenv.config()
 //instance of express
 const app= express()
