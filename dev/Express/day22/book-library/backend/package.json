@@ -4,8 +4,8 @@
     "main": "server.ts",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "start": "node server.ts",
-        "start:dev": "nodemon server.ts"
+        "start": "npm run build && node dist/server.js",
+        "start:dev": "nodemon --ext ts --exec ts-node src/server.ts"
     },
     "keywords": [],
     "author": "",
@@ -17,6 +17,7 @@
     },
     "devDependencies": {
         "@types/cors": "^2.8.17",
+        "@types/dotenv": "^8.2.3",
         "@types/express": "^5.0.0",
         "@types/node": "^22.13.9",
         "nodemon": "^3.1.9",
