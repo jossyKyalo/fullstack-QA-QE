@@ -1,9 +1,10 @@
-import express from "express"
+import express, {Request, Response} from "express"
 import dotenv from "dotenv"
 import {readFileSync} from "fs"
 import path from 'path'
 import cors from 'cors'
-
+import { Pool } from 'pg'
+ 
 //configure dotenv
 dotenv.config()
 //instance of express
@@ -29,14 +30,29 @@ const _dirname= path.resolve()
 const eventData= readFileSync(
     path.join(_dirname, "src", "db", "eventsData.json"), "utf-8"
 )
-//console.log(eventData)
-//simple get request
-app.get('/',(req, res)=>{
-    res.send('Hello World, Be humble to us😭😂')
-})
+//create a user (post /api/v1/users)
+//reading an external thing like a file, a database, etc, cloud
+//these things need time to connect to them- so making the request asynchronous will help the logic
+app.post('/api/v1/users', async(req:Request, res: Response)=>{
+    try{
+        const {name, email, password}= req.body
+        //check email exists
+        const emailExists= await Pool.query("SELECT id FROM users WHERE email= $1", [email])
+        if (emailExists.rows.length>0){
+            res.status(400).json({
+                message: "User already exists"
+            })
+        }
+        //insert user
+        const userResult= await Pool.query(
+            "INSERT INTO users (name, email, password) VALUES($1, $2, $3) RETURNING *;",[name, email, password]
+        )
+        res.status(201).json({
+            message: "User successfully created",
+        })
+    }catch(error){
 
-app.get('/events',(req, res)=>{
-    res.send(eventData)
+    }
 })
 //creating a server
 app.listen(port, ()=>{

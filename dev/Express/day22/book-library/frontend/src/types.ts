@@ -4,4 +4,5 @@ export interface Book {
     genre: string;
     year: number;
     pages: number;
+    image: string;
 }
