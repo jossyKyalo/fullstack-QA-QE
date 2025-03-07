@@ -1,12 +1,3 @@
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 import { fetchBooks } from "./api";
 const bookList = document.getElementById("book-list");
 const searchInput = document.getElementById("search-bar");
@@ -15,29 +6,39 @@ const yearFilter = document.getElementById("year-filter");
 const pageFilter = document.getElementById("page-filter");
 const sortPagesBtn = document.getElementById("sort-pages-btn");
 let books = [];
-function loadBooks() {
-    return __awaiter(this, void 0, void 0, function* () {
-        const filters = {
-            title: searchInput.value.trim() || undefined,
-            genre: genreFilter.value !== "all" ? genreFilter.value : undefined,
-            year: yearFilter.value ? yearFilter.value : undefined,
-            pages: pageFilter.value ? pageFilter.value : undefined
-        };
-        books = yield fetchBooks(filters);
-        renderBooks(books);
-    });
+export async function loadBooks() {
+    const filters = {};
+    if (searchInput.value.trim())
+        filters.title = searchInput.value.trim();
+    if (genreFilter.value !== "all")
+        filters.genre = genreFilter.value;
+    if (yearFilter.value)
+        filters.year = yearFilter.value;
+    if (pageFilter.value)
+        filters.pages = pageFilter.value;
+    console.log("Fetching books with filters", filters);
+    books = await fetchBooks(filters);
+    console.log("Fetched boks:", books);
+    renderBooks(books);
 }
 function renderBooks(books) {
+    console.log("Rendering books:", books);
+    if (!bookList) {
+        console.error("Error: #book-list not found in HTML!");
+        return;
+    }
     bookList.innerHTML = "";
-    books.forEach(book => {
+    books.forEach((book) => {
+        console.log("Rendering books:", book);
         const bookElement = document.createElement("div");
         bookElement.classList.add("book");
         bookElement.innerHTML = `
+            <img src="${book.image}" alt="${book.title}" style="width: 100%; height: 250px; object-fit: cover; border-radius: 10px;">
             <h3>${book.title}</h3>
-            <p>Author: ${book.author}</p>
-            <p>Genre: ${book.genre}</p>
-            <p>Year: ${book.year}</p>
-            <p>Pages: ${book.pages}</p>
+            <p><strong>Author:</strong> ${book.author}</p>
+            <p><strong>Genre:</strong> ${book.genre}</p>
+            <p><strong>Year:</strong> ${book.year}</p>
+            <p><strong>Pages:</strong> ${book.pages}</p>
         `;
         bookList.appendChild(bookElement);
     });

@@ -10,22 +10,30 @@ const sortPagesBtn = document.getElementById("sort-pages-btn")!;
 
 let books: Book[] = [];
 
-async function loadBooks() {
-    const filters = {
-        title: searchInput.value.trim() || undefined,
-        genre: genreFilter.value !== "all" ? genreFilter.value : undefined,
-        year: yearFilter.value ? yearFilter.value : undefined,
-        pages: pageFilter.value ? pageFilter.value : undefined
-    };
+export async function loadBooks() {
+    const filters: Record<string, string> = {};
 
+    if (searchInput.value.trim()) filters.title = searchInput.value.trim();
+    if (genreFilter.value !== "all") filters.genre = genreFilter.value;
+    if (yearFilter.value) filters.year = yearFilter.value;
+    if (pageFilter.value) filters.pages = pageFilter.value;
+    console.log("Fetching books with filters", filters)
     books = await fetchBooks(filters);
+    console.log("Fetched boks:", books)
     renderBooks(books);
 }
 
  
 function renderBooks(books: Book[]) {
+    console.log("Rendering books:", books);
+
+    if (!bookList) {
+        console.error("Error: #book-list not found in HTML!");
+        return;
+    }
     bookList.innerHTML = "";
     books.forEach((book: Book) => {
+        console.log("Rendering books:", book);
         const bookElement = document.createElement("div");
         bookElement.classList.add("book");
         bookElement.innerHTML = `
@@ -51,5 +59,6 @@ searchInput.addEventListener("input", loadBooks);
 genreFilter.addEventListener("change", loadBooks);
 yearFilter.addEventListener("input", loadBooks);
 pageFilter.addEventListener("input", loadBooks);
- 
+
 loadBooks();
+

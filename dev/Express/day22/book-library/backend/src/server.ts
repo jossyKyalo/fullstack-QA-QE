@@ -7,16 +7,16 @@ import { readFileSync } from "fs";
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 4000;
 
  
 app.use(cors({
   origin: "http://localhost:5173", 
-  methods: ["GET"],
+  methods: "GET, PUT, DELETE",
   credentials: true
 }));
 
-app.use("/images", express.static(path.join(__dirname, "images")));
+ 
 
 const dbPath = path.join(__dirname, "db", "db.json");
 let books: any[] = [];
