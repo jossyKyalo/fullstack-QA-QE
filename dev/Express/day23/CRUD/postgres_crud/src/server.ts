@@ -3,7 +3,7 @@ import dotenv from "dotenv"
 import {readFileSync} from "fs"
 import path from 'path'
 import cors from 'cors'
-import { Pool } from 'pg'
+import { pool } from './db/db.config.ts'
  
 //configure dotenv
 dotenv.config()
@@ -37,14 +37,14 @@ app.post('/api/v1/users', async(req:Request, res: Response)=>{
     try{
         const {name, email, password}= req.body
         //check email exists
-        const emailExists= await Pool.query("SELECT id FROM users WHERE email= $1", [email])
+        const emailExists= await pool.query("SELECT id FROM users WHERE email= $1", [email])
         if (emailExists.rows.length>0){
             res.status(400).json({
                 message: "User already exists"
             })
         }
         //insert user
-        const userResult= await Pool.query(
+        const userResult= await pool.query(
             "INSERT INTO users (name, email, password) VALUES($1, $2, $3) RETURNING *;",[name, email, password]
         )
         res.status(201).json({

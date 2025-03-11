@@ -5,4 +5,6 @@ export interface Book {
     year: number;
     pages: number;
     image: string;
+    price: number;
+    id: number;
 }
