@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout</title>
+</head>
+<body>
+    <h1>Checkout</h1>
+    <div id="checkout-details"></div>
+    <button onclick="completePurchase()">Complete Purchase</button>
+
+    <script>
+        function getQueryParam(name) {
+            const params = new URLSearchParams(window.location.search);
+            return params.get(name);
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const bookId = getQueryParam("bookId");
+            document.getElementById("checkout-details").innerHTML = `Book ID: ${bookId}`;
+        });
+
+        function completePurchase() {
+            alert("Purchase completed! Thank you!");
+            window.location.href = "/index.html";
+        }
+    </script>
+</body>
+</html>
