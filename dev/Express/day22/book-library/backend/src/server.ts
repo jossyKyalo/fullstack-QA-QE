@@ -3,20 +3,13 @@ import dotenv from "dotenv";
 import cors from "cors";
 import path from "path";
 import { readFileSync, writeFileSync } from "fs";
-import { Pool } from "./db.config";
+import  pool  from "./db.config";
 
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 4000;
 
-const pool = new Pool({
-    user: process.env.DB_USER,
-    host: process.env.DB_HOST,
-    database: process.env.DB_NAME,
-    password: process.env.DB_PASSWORD,
-    port: Number(process.env.DB_PORT),
-});
 
 app.use(cors({
   origin: "http://localhost:5173", 
