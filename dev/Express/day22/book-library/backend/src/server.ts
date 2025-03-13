@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import path from "path";
 import { readFileSync, writeFileSync } from "fs";
-import  pool  from "./db.config";
+import  pool  from "./db/db.config";
 
 dotenv.config();
 
@@ -95,6 +95,7 @@ app.get("/api/books/:id", async (req, res) => {
         res.status(500).json({ message: "Internal Server Error" });
     }
 });
+//test connection between backend and postgres
 app.get("/api/test-db", async (req: Request, res: Response) => {
     try {
         const client = await pool.connect();
