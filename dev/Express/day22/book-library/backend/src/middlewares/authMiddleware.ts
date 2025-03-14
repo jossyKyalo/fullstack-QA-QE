@@ -1,6 +1,9 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import pool from "../db/db.config";
+import dotenv from 'dotenv'
+
+dotenv.config();
 
 export const authenticateUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const token = req.header("Authorization")?.split(" ")[1];
