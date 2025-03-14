@@ -42,7 +42,16 @@ app.get("/api/test-db", async (req, res) => {
 app.use("/api/books", bookRoutes);
 
 // Error Handling Middleware
-app.use(asyncHandler);
+app.use((err: unknown, req: express.Request, res: express.Response, next: express.NextFunction) => {
+    console.error("Unhandled error:", err);
+  
+    let errMessage = "Internal Server Error";
+    if (err instanceof Error) {
+      errMessage = err.message;
+    }
+  
+    res.status(500).json({ message: errMessage });
+  });
 
 // Start Server
 app.listen(port, () => {

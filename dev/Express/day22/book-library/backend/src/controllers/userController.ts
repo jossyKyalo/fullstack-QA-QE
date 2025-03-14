@@ -22,13 +22,15 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
   
   const result = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
   if (result.rowCount === 0) {
-    return res.status(401).json({ message: "Invalid credentials" });
+    res.status(401).json({ message: "Invalid credentials" });
+    return 
   }
 
   const user = result.rows[0];
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) {
-    return res.status(401).json({ message: "Invalid credentials" });
+   res.status(401).json({ message: "Invalid credentials" });
+   return 
   }
 
   res.json({ message: "Login successful", user: { id: user.user_id, name: user.name, email: user.email } });
@@ -46,7 +48,8 @@ const getUserById = asyncHandler(async (req: Request, res: Response) => {
   const result = await pool.query("SELECT user_id, name, email, role_id FROM users WHERE user_id = $1", [id]);
 
   if (result.rowCount === 0) {
-    return res.status(404).json({ message: "User not found" });
+   res.status(404).json({ message: "User not found" });
+   return 
   }
 
   res.json(result.rows[0]);
@@ -63,7 +66,8 @@ const updateUser = asyncHandler(async (req: Request, res: Response) => {
   );
 
   if (result.rowCount === 0) {
-    return res.status(404).json({ message: "User not found" });
+    res.status(404).json({ message: "User not found" });
+    return 
   }
 
   res.json({ message: "User updated successfully", user: result.rows[0] });
@@ -76,7 +80,8 @@ const deleteUser = asyncHandler(async (req: Request, res: Response) => {
   const result = await pool.query("DELETE FROM users WHERE user_id = $1 RETURNING *", [id]);
 
   if (result.rowCount === 0) {
-    return res.status(404).json({ message: "User not found" });
+    res.status(404).json({ message: "User not found" });
+    return 
   }
 
   res.json({ message: `User ${id} deleted successfully` });
