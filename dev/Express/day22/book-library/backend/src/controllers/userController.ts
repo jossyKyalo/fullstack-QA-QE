@@ -6,8 +6,9 @@ import asyncHandler from "../middlewares/asyncHandler";
 
 const registerUser = asyncHandler(async (req: Request, res: Response) => {
   const { name, email, password, role_id } = req.body;
-
+  //hashing passwords
   const hashedPassword = await bcrypt.hash(password, 10);
+  //insert into user table
   const result = await pool.query(
     "INSERT INTO users (name, email, password, role_id) VALUES ($1, $2, $3, $4) RETURNING *",
     [name, email, hashedPassword, role_id]
@@ -27,6 +28,7 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
   }
 
   const user = result.rows[0];
+  //comparing passwords
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) {
    res.status(401).json({ message: "Invalid credentials" });
