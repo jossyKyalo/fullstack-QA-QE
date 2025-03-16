@@ -4,7 +4,7 @@ import cors from "cors";
 import path from "path";
 import bookRoutes from "./routes/bookRoutes";
 //import  asyncHandler  from "./middlewares/asyncHandler";
-import pool from "./db/db.config";
+import pool from "./config/db.config";
  
 dotenv.config();
 

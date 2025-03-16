@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
-import pool from "../db/db.config";
+import pool from "../config/db.config";
 import asyncHandler from "../middlewares/asyncHandler";
 
 

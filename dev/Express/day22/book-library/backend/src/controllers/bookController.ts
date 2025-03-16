@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import pool from "../db/db.config";
+import pool from "../config/db.config";
 
 
 export const addBook = async (req: Request, res: Response) => {
