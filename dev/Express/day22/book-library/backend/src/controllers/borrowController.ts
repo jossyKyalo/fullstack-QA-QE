@@ -1,139 +1,78 @@
 import { Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
+import pool from "../config/db.config";
+import asyncHandler from "../middlewares/asyncHandler";
+import { UserRequest } from "../utils/types/userTypes";
 
-const prisma = new PrismaClient();
+// Borrow a Book (Only Customers)
+export const borrowBook = asyncHandler(async (req: UserRequest, res: Response) => {
+    const { book_id } = req.body;
+    const borrower_id = req.user.user_id;
+    const borrow_date = new Date();
+    const return_date = new Date();
+    return_date.setDate(return_date.getDate() + 14); // Default return period: 2 weeks
 
-// Borrow a book
-export const borrowBook = async (req: Request, res: Response) => {
     try {
-        const { user_id, book_id, borrow_date, return_date } = req.body;
+        // Check if book exists and is available
+        const book = await pool.query("SELECT * FROM books WHERE book_id=$1", [book_id]);
+        if (book.rowCount === 0) return res.status(404).json({ message: "Book not found" });
 
-        // Check if the book exists
-        const book = await prisma.books.findUnique({ where: { book_id } });
-        if (!book) {
-            res.status(404).json({ message: "Book not found" });
-            return
-        }
+        // Insert borrow record
+        const result = await pool.query(
+            `INSERT INTO borrows (book_id, borrower_id, borrow_date, return_date, status) 
+            VALUES ($1, $2, $3, $4, 'Borrowed') RETURNING *`,
+            [book_id, borrower_id, borrow_date, return_date]
+        );
 
-        // Check if the book is already borrowed
-        const borrowed = await prisma.borrows.findFirst({
-            where: { book_id, status: "borrowed" },
-        });
-
-        if (borrowed) {
-            res.status(400).json({ message: "Book is already borrowed" });
-            return
-        }
-
-        // Create borrow record
-        const borrow = await prisma.borrows.create({
-            data: {
-                user_id,
-                book_id,
-                borrow_date: new Date(borrow_date),
-                return_date: new Date(return_date),
-                status: "borrowed",
-            },
-        });
-
-        res.status(201).json({ message: "Book borrowed successfully", borrow });
+        res.status(201).json({ message: "Book borrowed successfully", borrow: result.rows[0] });
     } catch (error) {
-        console.error(error);
+        console.error("Error borrowing book:", error);
         res.status(500).json({ message: "Internal Server Error" });
     }
-};
+});
 
-// Return a book
-export const returnBook = async (req: Request, res: Response) => {
+// Return a Book (Customer or Admin)
+export const returnBook = asyncHandler(async (req: UserRequest, res: Response) => {
+    const { borrow_id } = req.params;
+    const user_id = req.user.user_id;
+
     try {
-        const { borrow_id } = req.params;
-
         // Check if the borrow record exists
-        const borrow = await prisma.borrows.findUnique({
-            where: { borrow_id: Number(borrow_id) },
-        });
+        const borrow = await pool.query("SELECT * FROM borrows WHERE borrow_id=$1", [borrow_id]);
+        if (borrow.rowCount === 0) return res.status(404).json({ message: "Borrow record not found" });
 
-        if (!borrow) {
-            res.status(404).json({ message: "Borrow record not found" });
-            return
-        }
-
-        if (borrow.status === "returned") {
-            res.status(400).json({ message: "Book has already been returned" });
-            return
+        // Ensure only the borrower or an Admin can return the book
+        if (borrow.rows[0].borrower_id !== user_id && req.user.role_name !== "Admin") {
+            return res.status(403).json({ message: "Unauthorized to return this book" });
         }
 
         // Update status to returned
-        const updatedBorrow = await prisma.borrows.update({
-            where: { borrow_id: Number(borrow_id) },
-            data: { status: "returned" },
-        });
-
-        res.status(200).json({ message: "Book returned successfully", updatedBorrow });
+        await pool.query("UPDATE borrows SET status='Returned', actual_return_date=NOW() WHERE borrow_id=$1", [borrow_id]);
+        res.json({ message: "Book returned successfully" });
     } catch (error) {
-        console.error(error);
+        console.error("Error returning book:", error);
         res.status(500).json({ message: "Internal Server Error" });
     }
-};
+});
 
-export const updateBorrow = async (req: Request, res: Response) => {
+// Get all borrowed books (Admin Only)
+export const getAllBorrows = asyncHandler(async (req: UserRequest, res: Response) => {
     try {
-        const { borrow_id } = req.params;
-        const { return_date, status } = req.body;
-
-        // Check if borrow record exists
-        const borrow = await prisma.borrows.findUnique({
-            where: { borrow_id: Number(borrow_id) },
-        });
-
-        if (!borrow) {
-            res.status(404).json({ message: "Borrow record not found" });
-            return
-        }
-
-        // Update the borrow record
-        const updatedBorrow = await prisma.borrows.update({
-            where: { borrow_id: Number(borrow_id) },
-            data: {
-                return_date: return_date ? new Date(return_date) : borrow.return_date,
-                status: status || borrow.status,
-                updated_at: new Date(), // Ensure updated_at is refreshed
-            },
-        });
-
-        res.status(200).json({ message: "Borrow record updated successfully", updatedBorrow });
+        const result = await pool.query("SELECT * FROM borrows ORDER BY borrow_date DESC");
+        res.json(result.rows);
     } catch (error) {
-        console.error(error);
+        console.error("Error fetching borrowed books:", error);
         res.status(500).json({ message: "Internal Server Error" });
     }
-};
+});
 
-// Get all borrow records (Admin)
-export const getAllBorrows = async (req: Request, res: Response) => {
+// Get a user's borrowed books (Customer)
+export const getUserBorrows = asyncHandler(async (req: UserRequest, res: Response) => {
+    const user_id = req.user.user_id;
     try {
-        const borrows = await prisma.borrows.findMany({
-            include: { user: true, book: true },
-        });
-        res.status(200).json(borrows);
+        const result = await pool.query("SELECT * FROM borrows WHERE borrower_id=$1 ORDER BY borrow_date DESC", [user_id]);
+        res.json(result.rows);
     } catch (error) {
-        console.error(error);
+        console.error("Error fetching user's borrowed books:", error);
         res.status(500).json({ message: "Internal Server Error" });
     }
-};
-
-// Get borrow history for a specific user
-export const getUserBorrowHistory = async (req: Request, res: Response) => {
-    try {
-        const { user_id } = req.params;
-
-        const borrows = await prisma.borrows.findMany({
-            where: { user_id: Number(user_id) },
-            include: { book: true },
-        });
-
-        res.status(200).json(borrows);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Internal Server Error" });
-    }
-};
+});

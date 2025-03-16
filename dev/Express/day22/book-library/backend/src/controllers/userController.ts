@@ -1,92 +1,87 @@
 import { Request, Response } from "express";
-import bcrypt from "bcrypt";
 import pool from "../config/db.config";
 import asyncHandler from "../middlewares/asyncHandler";
+import bcrypt from "bcryptjs";
+import { UserRequest } from "../utils/types/userTypes";
 
-
-const registerUser = asyncHandler(async (req: Request, res: Response) => {
-  const { name, email, password, role_id } = req.body;
-  //hashing passwords
-  const hashedPassword = await bcrypt.hash(password, 10);
-  //insert into user table
-  const result = await pool.query(
-    "INSERT INTO users (name, email, password, role_id) VALUES ($1, $2, $3, $4) RETURNING *",
-    [name, email, hashedPassword, role_id]
-  );
-
-  res.status(201).json({ message: "User registered successfully", user: result.rows[0] });
+//  Get all users (Admin only)
+export const getUsers = asyncHandler(async (req: Request, res: Response) => {
+    const result = await pool.query("SELECT user_id, name, email, role_id FROM users ORDER BY user_id ASC");
+    res.status(200).json(result.rows);
 });
 
+//  Get a user by ID
+export const getUserById = asyncHandler(async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const result = await pool.query("SELECT user_id, name, email, role_id FROM users WHERE user_id = $1", [id]);
 
-const loginUser = asyncHandler(async (req: Request, res: Response) => {
-  const { email, password } = req.body;
-  
-  const result = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
-  if (result.rowCount === 0) {
-    res.status(401).json({ message: "Invalid credentials" });
-    return 
-  }
+    if (result.rows.length === 0) {
+        res.status(404).json({ message: "User not found" });
+        return 
+    }
 
-  const user = result.rows[0];
-  //comparing passwords
-  const isMatch = await bcrypt.compare(password, user.password);
-  if (!isMatch) {
-   res.status(401).json({ message: "Invalid credentials" });
-   return 
-  }
-
-  res.json({ message: "Login successful", user: { id: user.user_id, name: user.name, email: user.email } });
+    res.status(200).json(result.rows[0]);
 });
 
+//  Create a new user (Admin only)
+export const createUser = asyncHandler(async (req: Request, res: Response) => {
+    const { name, email, password, role_id } = req.body;
 
-const getAllUsers = asyncHandler(async (_req: Request, res: Response) => {
-  const result = await pool.query("SELECT user_id, name, email, role_id FROM users");
-  res.json(result.rows);
+    // Check if email already exists
+    const existingUser = await pool.query("SELECT user_id FROM users WHERE email = $1", [email]);
+    if (existingUser.rows.length > 0) {
+        res.status(400).json({ message: "User already exists" });
+        return 
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Insert user
+    const newUser = await pool.query(
+        "INSERT INTO users (name, email, password_hash, role_id) VALUES ($1, $2, $3, $4) RETURNING user_id, name, email, role_id",
+        [name, email, hashedPassword, role_id]
+    );
+
+    res.status(201).json(newUser.rows[0]);
 });
 
+//  Update user details (Admin & Manager)
+export const updateUser = asyncHandler(async (req: UserRequest, res: Response) => {
+    const { id } = req.params;
+    const { name, email, role_id } = req.body;
 
-const getUserById = asyncHandler(async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const result = await pool.query("SELECT user_id, name, email, role_id FROM users WHERE user_id = $1", [id]);
+    // Only Admins can change roles
+    if (req.user.role_name !== "Admin" && role_id) {
+        res.status(403).json({ message: "Only Admins can change roles" });
+        return 
+    }
 
-  if (result.rowCount === 0) {
-   res.status(404).json({ message: "User not found" });
-   return 
-  }
+    // Update user
+    const updatedUser = await pool.query(
+        "UPDATE users SET name = $1, email = $2, role_id = $3 WHERE user_id = $4 RETURNING user_id, name, email, role_id",
+        [name, email, role_id, id]
+    );
 
-  res.json(result.rows[0]);
+    if (updatedUser.rows.length === 0) {
+        res.status(404).json({ message: "User not found" });
+        return 
+    }
+
+    res.status(200).json(updatedUser.rows[0]);
 });
 
- 
-const updateUser = asyncHandler(async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const { name, email, role_id } = req.body;
+//  Delete user (Admin only)
+export const deleteUser = asyncHandler(async (req: Request, res: Response) => {
+    const { id } = req.params;
 
-  const result = await pool.query(
-    "UPDATE users SET name = $1, email = $2, role_id = $3 WHERE user_id = $4 RETURNING *",
-    [name, email, role_id, id]
-  );
+    // Delete user
+    const deletedUser = await pool.query("DELETE FROM users WHERE user_id = $1 RETURNING user_id", [id]);
 
-  if (result.rowCount === 0) {
-    res.status(404).json({ message: "User not found" });
-    return 
-  }
+    if (deletedUser.rows.length === 0) {
+        res.status(404).json({ message: "User not found" });
+        return 
+    }
 
-  res.json({ message: "User updated successfully", user: result.rows[0] });
+    res.status(200).json({ message: "User deleted successfully" });
 });
-
- 
-const deleteUser = asyncHandler(async (req: Request, res: Response) => {
-  const { id } = req.params;
-
-  const result = await pool.query("DELETE FROM users WHERE user_id = $1 RETURNING *", [id]);
-
-  if (result.rowCount === 0) {
-    res.status(404).json({ message: "User not found" });
-    return 
-  }
-
-  res.json({ message: `User ${id} deleted successfully` });
-});
-
-export { registerUser, loginUser, getAllUsers, getUserById, updateUser, deleteUser };

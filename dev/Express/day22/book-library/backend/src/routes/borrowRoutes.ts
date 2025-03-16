@@ -1,22 +1,20 @@
 import express from "express";
-import { borrowBook, returnBook, updateBorrow, getAllBorrows, getUserBorrowHistory } from "../controllers/borrowController";
-import { authenticateUser, isAdmin } from "../middlewares/authMiddleware";
+import { borrowBook, returnBook, getAllBorrows, getUserBorrows } from "../controllers/borrowController";
+import { protect } from "../middlewares/auth/protect";
+import { adminGuard, customerGuard } from "../middlewares/auth/roleMiddleware";
 
 const router = express.Router();
 
-// Borrow a book
-router.post("/", authenticateUser, borrowBook);
+// Customers borrow a book
+router.post("/borrow", protect, customerGuard, borrowBook);
 
-// Return a book
-router.put("/return/:borrow_id", authenticateUser, returnBook);
+// Customers & Admins return a book
+router.post("/return/:borrow_id", protect, returnBook);
 
-// Update borrow record (Only Admins)
-router.put("/:borrow_id", authenticateUser, isAdmin, updateBorrow); 
+// Admins get all borrow records
+router.get("/all", protect, adminGuard, getAllBorrows);
 
-// Get all borrow records (Admin only)
-router.get("/", authenticateUser, isAdmin, getAllBorrows);
-
-// Get user borrow history
-router.get("/:user_id", authenticateUser, getUserBorrowHistory);
+// Customers get their own borrow records
+router.get("/my-borrows", protect, customerGuard, getUserBorrows);
 
 export default router;

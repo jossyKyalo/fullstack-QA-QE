@@ -1,21 +1,26 @@
 import express from "express";
 import {
-  registerUser,
-  loginUser,
-  getAllUsers,
-  getUserById,
-  updateUser,
-  deleteUser,
+    getUsers,
+    getUserById,
+    createUser,
+    updateUser,
+    deleteUser
 } from "../controllers/userController";
+import { protect } from "../middlewares/auth/protect";
+import { adminGuard } from "../middlewares/auth/roleMiddleware";
 
 const router = express.Router();
 
-router.post("/register", registerUser);
-router.post("/login", loginUser);
-router.get("/", getAllUsers);
-router.get("/:id", getUserById);
-router.put("/:id", updateUser);
-router.delete("/:id", deleteUser);
+// Public route: Register a new user
+router.post("/", createUser);
+
+// Private routes: Require authentication
+router.use(protect);
+
+// Admin-only routes
+router.get("/", adminGuard, getUsers); // Get all users (Admin)
+router.get("/:id", adminGuard, getUserById); // Get a user by ID (Admin)
+router.put("/:id", adminGuard, updateUser); // Update user (Admin)
+router.delete("/:id", adminGuard, deleteUser); // Delete user (Admin)
 
 export default router;
-
