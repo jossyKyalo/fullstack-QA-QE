@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import path from "path";
 import { readFileSync, writeFileSync } from "fs";
-import  pool  from "./db/db.config";
+import  pool  from "./config/db.config";
 
 dotenv.config();
 
