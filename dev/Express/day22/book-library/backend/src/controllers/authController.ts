@@ -8,7 +8,7 @@ import {generateTokens} from "../utils/helpers/generateToken";
 
  
 export const registerUser = asyncHandler(async (req: UserRequest, res: Response, next: NextFunction) => {
-    const { name, email, password, role_id = 1 } = req.body;
+    const { name, email, password_hash, role_id = 1 } = req.body;
 
     // Check if user exists
     const userExists = await pool.query("SELECT user_id FROM users WHERE email = $1", [email]);
@@ -20,7 +20,7 @@ export const registerUser = asyncHandler(async (req: UserRequest, res: Response,
 
     // Hash password
     const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const hashedPassword = await bcrypt.hash(password_hash, salt);
 
     // Insert user into DB
     const newUser = await pool.query(
@@ -41,13 +41,13 @@ export const registerUser = asyncHandler(async (req: UserRequest, res: Response,
 
  
 export const loginUser = asyncHandler(async (req: UserRequest, res: Response, next: NextFunction) => {
-    const { email, password } = req.body;
+    const { email, password_hash } = req.body;
 
     // Check if user exists
     const userQuery = await pool.query(
-        `SELECT users.user_id, users.name, users.email, users.password_hash, users.role_id, user_roles.role_name
+        `SELECT users.user_id, users.name, users.email, users.password_hash, users.role_id, user_role.role_name
          FROM users
-         JOIN user_roles ON users.role_id = user_roles.id
+         JOIN user_role ON users.role_id = user_role.role_id
          WHERE email = $1`,
         [email]
     );
@@ -60,7 +60,7 @@ export const loginUser = asyncHandler(async (req: UserRequest, res: Response, ne
     const user = userQuery.rows[0];
 
     // Compare passwords
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(password_hash, user.password_hash);
     if (!isMatch) {
         res.status(401).json({ message: "Invalid email or password" });
         return;
