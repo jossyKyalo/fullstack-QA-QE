@@ -1,59 +1,45 @@
+import { setupAliases } from "import-aliases";
+setupAliases()
 import express from "express";
 import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
 import cors from "cors";
-import path from "path";
-import bookRoutes from "./routes/bookRoutes";
-//import  asyncHandler  from "./middlewares/asyncHandler";
-import pool from "./config/db.config";
- 
+import authRoutes from "@app/routes/authRoutes";
+import userRoutes from "@app/routes/userRoutes";
+import bookRoutes from "@app/routes/bookRoutes";
+import borrowRoutes from "@app/routes/borrowRoutes";
+import pool from "@app/config/db.config";  
+
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 4000;
 
- 
+// Middleware
 app.use(express.json());
-app.use(
-  cors({
+app.use(cookieParser());
+app.use(cors({
     origin: "http://localhost:5173", 
-    methods: "GET, POST, PUT, PATCH, DELETE",
-    credentials: true,
-  })
-);
-
-
-app.use(express.static(path.join(__dirname, "public")));
-
-// Database connection test
-app.get("/api/test-db", async (req, res) => {
-  try {
-    const client = await pool.connect();
-    const result = await client.query("SELECT NOW();");
-    client.release();
-    res.json({ message: "Database connected successfully!", time: result.rows[0].now });
-  } catch (error: unknown) {
-    console.error("Database connection error:", error);
-    const errMessage= error instanceof Error ? error.message : "Unknown occurred";
-    res.status(500).json({ message: "Database connection failed",   errMessage });
-  }
-});
+    methods: "GET, PUT, DELETE",
+    credentials: true }));
 
 // Routes
+app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
 app.use("/api/books", bookRoutes);
+app.use("/api/borrow", borrowRoutes);
 
-// Error Handling Middleware
-app.use((err: unknown, req: express.Request, res: express.Response, next: express.NextFunction) => {
-    console.error("Unhandled error:", err);
-  
-    let errMessage = "Internal Server Error";
-    if (err instanceof Error) {
-      errMessage = err.message;
-    }
-  
-    res.status(500).json({ message: errMessage });
-  });
+// Root Route
+app.get("/", (req, res) => {
+  res.send("Library Management System API is running...");
+});
+
+// Database Connection Test
+pool.connect()
+  .then(() => console.log("Connected to Database"))
+  .catch((err) => console.error("Database Connection Error:", err));
 
 // Start Server
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
