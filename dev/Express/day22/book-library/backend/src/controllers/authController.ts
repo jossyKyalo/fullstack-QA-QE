@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 import asyncHandler from "../middlewares/asyncHandler";
 import { UserRequest } from "../utils/types/userTypes";
 import pool from "../config/db.config";
-import generateToken from "../utils/helpers/generateToken";
+import {generateTokens} from "../utils/helpers/generateToken";
 
  
 export const registerUser = asyncHandler(async (req: UserRequest, res: Response, next: NextFunction) => {
@@ -29,7 +29,7 @@ export const registerUser = asyncHandler(async (req: UserRequest, res: Response,
     );
 
     // Generate JWT Token
-    generateToken(res, newUser.rows[0].user_id, newUser.rows[0].role_id);
+    generateTokens(res, newUser.rows[0].user_id, newUser.rows[0].role_id);
 
     res.status(201).json({
         message: "User registered successfully",
@@ -67,7 +67,7 @@ export const loginUser = asyncHandler(async (req: UserRequest, res: Response, ne
     }
 
     // Generate JWT Token
-    generateToken(res, user.user_id, user.role_id);
+    generateTokens(res, user.user_id, user.role_id);
 
     res.status(200).json({
         message: "Login successful",

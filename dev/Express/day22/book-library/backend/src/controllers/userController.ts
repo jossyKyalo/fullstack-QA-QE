@@ -46,15 +46,19 @@ export const createUser = asyncHandler(async (req: Request, res: Response) => {
     res.status(201).json(newUser.rows[0]);
 });
 
-//  Update user details (Admin & Manager)
 export const updateUser = asyncHandler(async (req: UserRequest, res: Response) => {
+    if (!req.user) {
+        res.status(401).json({ message: "Unauthorized: User not found" });
+        return
+    }
+
     const { id } = req.params;
     const { name, email, role_id } = req.body;
 
     // Only Admins can change roles
     if (req.user.role_name !== "Admin" && role_id) {
         res.status(403).json({ message: "Only Admins can change roles" });
-        return 
+        return;
     }
 
     // Update user
@@ -65,12 +69,13 @@ export const updateUser = asyncHandler(async (req: UserRequest, res: Response) =
 
     if (updatedUser.rows.length === 0) {
         res.status(404).json({ message: "User not found" });
-        return 
+        return;
     }
 
     res.status(200).json(updatedUser.rows[0]);
 });
 
+ 
 //  Delete user (Admin only)
 export const deleteUser = asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
