@@ -8,7 +8,8 @@ export const addBook = async (req: Request, res: Response) => {
     const created_at = new Date();
 
     if (role !== "admin") {
-        return res.status(403).json({ message: "Access denied. Only admins can add books." });
+        res.status(403).json({ message: "Access denied. Only admins can add books." });
+        return
     }
 
     try {
@@ -19,9 +20,11 @@ export const addBook = async (req: Request, res: Response) => {
         );
 
         res.status(201).json({ message: "Book added successfully", book: result.rows[0] });
+        return
     } catch (error) {
         console.error("Error adding book:", error);
         res.status(500).json({ message: "Internal Server Error" });
+        return
     }
 };
 
@@ -56,9 +59,11 @@ export const getAllBooks = async (req: Request, res: Response) => {
     try {
         const result = await pool.query(query, values);
         res.json(result.rows);
+        return
     } catch (error) {
         console.error("Error fetching books:", error);
         res.status(500).json({ message: "Internal Server Error" });
+        return
     }
 };
 
@@ -70,13 +75,15 @@ export const getBookById = async (req: Request, res: Response) => {
         const result = await pool.query("SELECT * FROM books WHERE book_id=$1", [book_id]);
 
         if (result.rowCount === 0) {
-            return res.status(404).json({ message: "Book not found" });
+            res.status(404).json({ message: "Book not found" });
+            return
         }
 
         res.json(result.rows[0]);
     } catch (error) {
         console.error("Error fetching book:", error);
         res.status(500).json({ message: "Internal Server Error" });
+        return
     }
 };
 
@@ -96,13 +103,15 @@ export const updateBook = async (req: Request, res: Response) => {
         );
 
         if (result.rowCount === 0) {
-            return res.status(404).json({ message: "Book not found or unauthorized" });
+            res.status(404).json({ message: "Book not found or unauthorized" });
+            return
         }
 
         res.json({ message: "Book updated successfully", book: result.rows[0] });
     } catch (error) {
         console.error("Error updating book:", error);
         res.status(500).json({ message: "Internal Server Error" });
+        return
     }
 };
 
@@ -112,19 +121,23 @@ export const deleteBook = async (req: Request, res: Response) => {
     const { role } = (req as any).user; // Extract user role
 
     if (role !== "admin") {
-        return res.status(403).json({ message: "Access denied. Only admins can delete books." });
+        res.status(403).json({ message: "Access denied. Only admins can delete books." });
+        return
     }
 
     try {
         const result = await pool.query("DELETE FROM books WHERE book_id=$1", [book_id]);
 
         if (result.rowCount === 0) {
-            return res.status(404).json({ message: "Book not found" });
+            res.status(404).json({ message: "Book not found" });
+            return
         }
 
         res.json({ message: "Book deleted successfully" });
+        return
     } catch (error) {
         console.error("Error deleting book:", error);
         res.status(500).json({ message: "Internal Server Error" });
+        return
     }
 };
