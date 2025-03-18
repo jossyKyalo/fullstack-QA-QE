@@ -103,3 +103,4 @@ export const logoutUser = asyncHandler(async (req: UserRequest, res: Response, n
 
     next();
 });
+
