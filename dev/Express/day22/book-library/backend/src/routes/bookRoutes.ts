@@ -9,7 +9,6 @@ import {
 import { protect } from "../middlewares/auth/protect";
 import { adminGuard } from "../middlewares/auth/roleMiddleware";
 
-
 const router = express.Router();
 
 // 📌 Public routes (Accessible to all)
