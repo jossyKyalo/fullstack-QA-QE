@@ -1,14 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
     <title>Book Library</title>
 </head>
+
 <body>
-    <h1>📚 Book Library</h1>
-    <button id="post-book-btn">➕ Post a Book</button>
+    <header>
+        <h1>📚 Book Library</h1>
+        <div class="auth-buttons">
+            <a href="login.html" id="login-link">Login</a>
+            <button id="register-btn" onclick="window.location.href='register.html'">Register</button>
+            <button id="post-book-btn">➕ Post a Book</button>
+        </div>
+    </header>
+
     <div id="post-book-modal" class="modal">
         <div class="modal-content">
             <span class="close-btn">&times;</span>
@@ -24,24 +33,22 @@
             </form>
         </div>
     </div>
-    <input type="text" id="search-bar" placeholder="Search by title...">
+    <div class="controls-row">
+        <input type="text" id="search-bar" placeholder="Search by title...">
 
-    <select id="genre-filter">
-        <option value="all">All Genres</option>
-        <option value="Fiction">Fiction</option>
-        <option value="Dystopian">Dystopian</option>
-        <option value="Fantasy">Fantasy</option>
-        <option value="Romance">Romance</option>
-    </select>
-
-    <input type="number" id="year-filter" placeholder="Published After (Year)">
-    <input type="number" id="page-filter" placeholder="Min Pages">
-
-
-    <button id="sort-year-btn">Sort by Year</button>
-    <button id="sort-pages-btn">Sort by Pages</button>
+        <select id="genre-filter">
+            <option value="all">All Genres</option>
+            <option value="Fiction">Fiction</option>
+            <option value="Dystopian">Dystopian</option>
+            <option value="Fantasy">Fantasy</option>
+            <option value="Romance">Romance</option>
+        </select>
+        <input type="number" id="year-filter" placeholder="Published After (Year)">
+        <input type="number" id="page-filter" placeholder="Min Pages">
+        <button id="sort-year-btn">Sort by Year</button>
+        <button id="sort-pages-btn">Sort by Pages</button>
+    </div>
     <div id="book-list"></div>
-    
 
     <div id="modal" class="modal">
         <div class="modal-content">
@@ -65,4 +72,5 @@
     </div>
     <script type="module" src="./dist/index.js"></script>
 </body>
+
 </html>
