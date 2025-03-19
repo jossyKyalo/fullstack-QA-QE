@@ -10,9 +10,11 @@ import bookRoutes from "@app/routes/bookRoutes";
 import borrowRoutes from "@app/routes/borrowRoutes";
 import pool from "@app/config/db.config";  
 
+
 dotenv.config();
 
 const app = express();
+
 
 // Middleware
 app.use(express.json());
