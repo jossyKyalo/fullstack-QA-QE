@@ -4,9 +4,9 @@ import pool from "../config/db.config";
 // Add a new book (Only Admin)
 export const addBook = async (req: Request, res: Response) => {
     const { title, author, genre, year, pages, publisher, description, image, price, total_copies } = req.body;
-    const { role } = (req as any).user; // Extract user role
+    const { role_name } = (req as any).user; // Extract user role
 
-    if (role !== "admin") {
+    if (role_name !== "Admin") {
         res.status(403).json({ message: "Access denied. Only admins can add books." });
         return
     }
@@ -53,7 +53,7 @@ export const getAllBooks = async (req: Request, res: Response) => {
         values.push(Number(year));
     }
 
-    query += ` ORDER BY created_at DESC LIMIT $${values.length + 1} OFFSET $${values.length + 2}`;
+    query += ` ORDER BY  book_id DESC LIMIT $${values.length + 1} OFFSET $${values.length + 2}`;
     values.push(Number(limit), offset);
 
     try {
@@ -92,9 +92,9 @@ export const getBookById = async (req: Request, res: Response) => {
 export const updateBook = async (req: Request, res: Response) => {
     const { book_id } = req.params;
     const { title, author, genre, year, pages, publisher, description, image, price, total_copies, available_copies } = req.body;
-    const { role } = (req as any).user; // Extract user role
+    const { role_name } = (req as any).user; // Extract user role
 
-    if (role !== "admin") {
+    if (role_name !== "Admin") {
         res.status(403).json({ message: "Access denied. Only admins can update books." });
         return
     }
@@ -124,9 +124,9 @@ export const updateBook = async (req: Request, res: Response) => {
 // Delete book (Only Admin)
 export const deleteBook = async (req: Request, res: Response) => {
     const { book_id } = req.params;
-    const { role } = (req as any).user; // Extract user role
+    const { role_name } = (req as any).user; // Extract user role
 
-    if (role !== "admin") {
+    if (role_name !== "Admin") {
         res.status(403).json({ message: "Access denied. Only admins can delete books." });
         return
     }

@@ -36,11 +36,11 @@ export const protect = asyncHandler(async (req: UserRequest, res: Response, next
         
         const userQuery = await pool.query(
             `SELECT 
-                users.id, users.name, users.email, users.role_id, 
-                user_roles.role_name 
+                users.user_id, users.name, users.email, users.role_id, 
+                user_role.role_name 
             FROM users 
-            JOIN user_roles ON users.role_id = user_roles.id 
-            WHERE users.id = $1`,
+            JOIN user_role ON users.role_id = user_role.role_id 
+            WHERE users.user_id = $1`,
             [decoded.userId]
         );
 
