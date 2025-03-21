@@ -1,9 +1,9 @@
 import { fetchBooks } from "./api";
-import { Book } from "./types";   
+import { Book } from "./types";
 
 const bookList = document.getElementById("book-list")!;
-const cartItemsContainer=document.getElementById("cart-items")!;
-const totalAmount= document.getElementById("total-amount")!;
+const cartItemsContainer = document.getElementById("cart-items")!;
+const totalAmount = document.getElementById("total-amount")!;
 const searchInput = document.getElementById("search-bar") as HTMLInputElement;
 const genreFilter = document.getElementById("genre-filter") as HTMLSelectElement;
 const yearFilter = document.getElementById("year-filter") as HTMLInputElement;
@@ -18,7 +18,7 @@ const closeBtn = document.querySelector(".close-btn")!;
 const postBookForm = document.getElementById("post-book-form")! as HTMLFormElement;
 
 let books: Book[] = [];
-let cart: Book[]=JSON.parse(localStorage.getItem("cart")||"[]");
+let cart: Book[] = JSON.parse(localStorage.getItem("cart") || "[]");
 
 export async function loadBooks() {
     const filters: Record<string, string> = {};
@@ -37,6 +37,14 @@ function toggleCart() {
     cartModal.style.display = cartModal.style.display === "block" ? "none" : "block";
     updateCartDisplay();
 }
+function saveUserRole(role_name: string) {
+    localStorage.setItem("userRole", role_name);
+}
+
+function getUserRole(): string | null {
+    return localStorage.getItem("userRole");
+}
+
 function renderBooks(books: Book[]) {
     console.log("Rendering books:", books);
 
@@ -44,6 +52,7 @@ function renderBooks(books: Book[]) {
         console.error("Error: #book-list not found in HTML!");
         return;
     }
+    const userRole = getUserRole();
     bookList.innerHTML = "";
     books.forEach((book: Book) => {
         console.log("Rendering books:", book);
@@ -59,10 +68,27 @@ function renderBooks(books: Book[]) {
             <p><strong>Price: </strong>$${book.price}</p>
             <button class="add-to-cart" data-id="${book.id}"> Add to Cart</button>
             <button class="buy-now" data-id="${book.id}">Buy Now</button>
+            ${userRole === "Librarian" ? `<button class="edit-book" data-id="${book.id}">✏️ Edit</button>` : ""}
+            ${userRole === "Admin" ? `<button class="delete-book" data-id="${book.id}">❌ Delete</button>` : ""}
         `;
         bookList.appendChild(bookElement);
     });
-    
+    // document.querySelectorAll(".edit-book").forEach(button => {
+    //     button.addEventListener("click", (event) => {
+    //         const bookId = (event.target as HTMLElement).getAttribute("data-id");
+    //         editBook(bookId);
+    //     });
+    // });
+
+    // document.querySelectorAll(".delete-book").forEach(button => {
+    //     button.addEventListener("click", (event) => {
+    //         const bookId = (event.target as HTMLElement).getAttribute("data-id");
+    //         if (confirm("Are you sure you want to delete this book?")) {
+    //             deleteBook(bookId);
+    //         }
+    //     });
+    // });
+
     document.querySelectorAll(".add-to-cart").forEach(button => {
         button.addEventListener("click", (event) => {
             const bookId = (event.target as HTMLElement).getAttribute("data-id");
@@ -78,10 +104,10 @@ function renderBooks(books: Book[]) {
     });
 }
 
- 
+
 function addToCart(bookId: string | null) {
     if (!bookId) return;
-    
+
     const book = books.find(b => b.id.toString() === bookId);
     if (!book) return;
 
@@ -91,7 +117,7 @@ function addToCart(bookId: string | null) {
     alert(`${book.title} added to cart!`);
     updateCartDisplay();
 }
- 
+
 function updateCartDisplay() {
     cartItemsContainer.innerHTML = "";
     let total = 0;
@@ -108,7 +134,7 @@ function updateCartDisplay() {
 
     totalAmount.textContent = `Total: $${total.toFixed(2)}`;
 }
- 
+
 function buyNow(bookId: string | null) {
     if (!bookId) return;
 
@@ -120,18 +146,18 @@ function buyNow(bookId: string | null) {
 }
 
 
- 
+
 cartIcon.addEventListener("click", toggleCart);
 postBookBtn.addEventListener("click", () => {
     postBookModal.style.display = "block";
 });
 
- 
+
 closeBtn.addEventListener("click", () => {
     postBookModal.style.display = "none";
 });
 
- 
+
 postBookForm.addEventListener("submit", async (event) => {
     event.preventDefault();
 
@@ -153,7 +179,7 @@ postBookForm.addEventListener("submit", async (event) => {
     if (response.ok) {
         alert("✅ Book added successfully!");
         postBookModal.style.display = "none";
-        loadBooks();  
+        loadBooks();
     } else {
         alert("❌ Failed to add book!");
     }
@@ -164,7 +190,7 @@ sortPagesBtn.addEventListener("click", () => {
     renderBooks(books);
 });
 
- 
+
 searchInput.addEventListener("input", loadBooks);
 genreFilter.addEventListener("change", loadBooks);
 yearFilter.addEventListener("input", loadBooks);
