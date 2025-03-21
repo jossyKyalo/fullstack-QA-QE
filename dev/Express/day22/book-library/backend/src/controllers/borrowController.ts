@@ -80,7 +80,7 @@ export const returnBook = asyncHandler(async (req: UserRequest, res: Response) =
     try {
         // Check if the borrow record exists
         const borrowQuery = await pool.query(
-            "SELECT b.*, bc.book_id FROM borrowers b JOIN bookcopies bc ON b.copy_id = bc.copy_id WHERE b.borrower_id=$1",
+            "SELECT b.borrower_id, b.user_id, b.copy_id, b.status, bc.book_id FROM borrowers b JOIN bookcopies bc ON b.copy_id = bc.copy_id WHERE b.borrower_id=$1",
             [borrower_id]
         );
 
@@ -94,6 +94,10 @@ export const returnBook = asyncHandler(async (req: UserRequest, res: Response) =
         // Only the borrower or an Admin can return the book
         if (borrowRecord.user_id !== user_id && req.user.role_name !== "Admin") {
             res.status(403).json({ message: "Unauthorized to return this book" });
+            return;
+        }
+        if (borrowRecord.status === "Returned") {
+            res.status(400).json({ message: "Book is already returned" });
             return;
         }
 
