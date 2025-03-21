@@ -12,8 +12,8 @@ export const getUsers = asyncHandler(async (req: Request, res: Response) => {
 
 //  Get a user by ID
 export const getUserById = asyncHandler(async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const result = await pool.query("SELECT user_id, name, email, role_id FROM users WHERE user_id = $1", [id]);
+    const { user_id } = req.params;
+    const result = await pool.query("SELECT user_id, name, email, role_id FROM users WHERE user_id = $1", [user_id]);
 
     if (result.rows.length === 0) {
         res.status(404).json({ message: "User not found" });
@@ -52,7 +52,7 @@ export const updateUser = asyncHandler(async (req: UserRequest, res: Response) =
         return
     }
 
-    const { id } = req.params;
+    const { user_id } = req.params;
     const { name, email, role_id } = req.body;
 
     // Only Admins can change roles
@@ -64,7 +64,7 @@ export const updateUser = asyncHandler(async (req: UserRequest, res: Response) =
     // Update user
     const updatedUser = await pool.query(
         "UPDATE users SET name = $1, email = $2, role_id = $3 WHERE user_id = $4 RETURNING user_id, name, email, role_id",
-        [name, email, role_id, id]
+        [name, email, role_id, user_id]
     );
 
     if (updatedUser.rows.length === 0) {
@@ -78,10 +78,10 @@ export const updateUser = asyncHandler(async (req: UserRequest, res: Response) =
  
 //  Delete user (Admin only)
 export const deleteUser = asyncHandler(async (req: Request, res: Response) => {
-    const { id } = req.params;
+    const { user_id } = req.params;
 
     // Delete user
-    const deletedUser = await pool.query("DELETE FROM users WHERE user_id = $1 RETURNING user_id", [id]);
+    const deletedUser = await pool.query("DELETE FROM users WHERE user_id = $1 RETURNING user_id", [user_id]);
 
     if (deletedUser.rows.length === 0) {
         res.status(404).json({ message: "User not found" });

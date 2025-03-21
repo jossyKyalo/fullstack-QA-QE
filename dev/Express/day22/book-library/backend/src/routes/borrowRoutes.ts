@@ -10,7 +10,7 @@ router.use(protect);
 router.post("/", borrowBook);
 
 // Borrowers & Admins return a book
-router.post("/:borrow_id", returnBook);
+router.post("/:borrower_id", returnBook);
 
 // Admins get all borrow records
 router.get("/all",  adminGuard, getAllBorrows);
