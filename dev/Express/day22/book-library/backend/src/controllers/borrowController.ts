@@ -3,7 +3,7 @@ import pool from "../config/db.config";
 import asyncHandler from "../middlewares/asyncHandler";
 import { UserRequest } from "../utils/types/userTypes";
 
-// Borrow a Book (Only Customers)
+// Borrow a Book (Only Borrowers)
 export const borrowBook = asyncHandler(async (req: UserRequest, res: Response) => {
     if (!req.user) {
         res.status(401).json({ message: "Unauthorized" });
@@ -67,7 +67,7 @@ export const borrowBook = asyncHandler(async (req: UserRequest, res: Response) =
     }
 });
 
-// Return a Book (Customer or Admin)
+// Return a Book (Borrower or Admin)
 export const returnBook = asyncHandler(async (req: UserRequest, res: Response) => {
     if (!req.user) {
         res.status(401).json({ message: "Unauthorized" });
@@ -150,7 +150,7 @@ export const getAllBorrows = asyncHandler(async (req: UserRequest, res: Response
     }
 });
 
-// Get a user's borrowed books (Customer)
+// Get a user's borrowed books (Borrower)
 export const getUserBorrows = asyncHandler(async (req: UserRequest, res: Response) => {
     if (!req.user) {
         res.status(401).json({ message: "Unauthorized" });
