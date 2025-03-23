@@ -41,33 +41,70 @@ export const borrowBook = asyncHandler(async (req: UserRequest, res: Response) =
 
         const copy_id = availableCopy.rows[0].copy_id;
 
-        // Update book copy status to borrowed
-        await pool.query(
-            "UPDATE bookcopies SET status = 'Borrowed' WHERE copy_id = $1",
-            [copy_id]
-        );
-
-        // Update available copies count in books table
-        await pool.query(
-            "UPDATE books SET available_copies = available_copies - 1 WHERE book_id = $1",
-            [book_id]
-        );
-
         // Insert borrow record
         const result = await pool.query(
             `INSERT INTO borrowers (user_id, copy_id, librarian_id, borrow_date, return_date, status) 
-             VALUES ($1, $2, $3, $4, $5, 'Borrowed') RETURNING *`,
+             VALUES ($1, $2, $3, $4, $5, 'Reserved') RETURNING *`,
             [user_id, copy_id, librarian_id, borrow_date, return_date]
         );
 
-        res.status(201).json({ message: "Book borrowed successfully", borrow: result.rows[0] });
+        res.status(201).json({ message:  "Borrow request submitted. Waiting for librarian approval.", borrow: result.rows[0] });
     } catch (error) {
         console.error("Error borrowing book:", error);
         res.status(500).json({ message: "Internal Server Error" });
     }
 });
 
-// Return a Book (Borrower or Admin)
+export const approveBorrowRequest = asyncHandler(async (req: UserRequest, res: Response) => {
+    if (!req.user || req.user.role_name !== "Librarian") {
+        res.status(403).json({ message: "Unauthorized: Only librarians can approve borrow requests." });
+        return;
+    }
+
+    const { borrower_id, action } = req.body; // action can be 'Approve' or 'Decline'
+
+    try {
+        // Check if the borrow record exists
+        const borrowQuery = await pool.query("SELECT * FROM borrowers WHERE borrower_id=$1", [borrower_id]);
+        if (borrowQuery.rowCount === 0) {
+            res.status(404).json({ message: "Borrow request not found" });
+            return;
+        }
+
+        const borrowRecord = borrowQuery.rows[0];
+
+        if (borrowRecord.status !== "Pending Approval") {
+            res.status(400).json({ message: "This borrow request has already been processed." });
+            return;
+        }
+
+        if (action === "Approve") {
+            // Update borrow record status
+            await pool.query("UPDATE borrowers SET status='Borrowed' WHERE borrower_id=$1", [borrower_id]);
+
+            // Update book copy status to borrowed
+            await pool.query("UPDATE bookcopies SET status = 'Borrowed' WHERE copy_id = $1", [borrowRecord.copy_id]);
+
+            // Decrease available copies count
+            await pool.query("UPDATE books SET available_copies = available_copies - 1 WHERE book_id = $1", [borrowRecord.book_id]);
+
+            res.json({ message: "Borrow request approved successfully." });
+        } else if (action === "Decline") {
+            // Remove borrow request
+            await pool.query("DELETE FROM borrowers WHERE borrower_id=$1", [borrower_id]);
+
+            res.json({ message: "Borrow request declined." });
+        } else {
+            res.status(400).json({ message: "Invalid action. Use 'Approve' or 'Decline'." });
+        }
+    } catch (error) {
+        console.error("Error approving borrow request:", error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+});
+
+
+// Return a Book (Borrower or Admin or Librarian)
 export const returnBook = asyncHandler(async (req: UserRequest, res: Response) => {
     if (!req.user) {
         res.status(401).json({ message: "Unauthorized" });
@@ -92,7 +129,7 @@ export const returnBook = asyncHandler(async (req: UserRequest, res: Response) =
         const borrowRecord = borrowQuery.rows[0];
 
         // Only the borrower or an Admin can return the book
-        if (borrowRecord.user_id !== user_id && req.user.role_name !== "Admin") {
+        if (borrowRecord.user_id !== user_id && req.user.role_name !== "Admin" && req.user.role_name !== "Librarian") {
             res.status(403).json({ message: "Unauthorized to return this book" });
             return;
         }
