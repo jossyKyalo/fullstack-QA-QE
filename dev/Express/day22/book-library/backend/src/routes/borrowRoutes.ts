@@ -1,5 +1,5 @@
 import express from "express";
-import { borrowBook, returnBook, getAllBorrows, getUserBorrows } from "../controllers/borrowController";
+import { borrowBook, returnBook, getAllBorrows, getUserBorrows, approveBorrowRequest } from "../controllers/borrowController";
 import { protect } from "../middlewares/auth/protect";
 import { adminGuard} from "../middlewares/auth/roleMiddleware";
 
@@ -16,6 +16,8 @@ router.post("/:borrower_id", returnBook);
 router.get("/all",  adminGuard, getAllBorrows);
 
 // Borrowers get their own borrow records
-router.get("/", protect, getUserBorrows);
+router.get("/", getUserBorrows);
+//approving borrow requests
+router.patch("/:borrow_id/approve", adminGuard, approveBorrowRequest);
 
 export default router;
