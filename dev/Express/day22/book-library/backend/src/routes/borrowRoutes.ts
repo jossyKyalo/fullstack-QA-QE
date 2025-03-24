@@ -18,6 +18,6 @@ router.get("/all",  adminGuard, getAllBorrows);
 // Borrowers get their own borrow records
 router.get("/", getUserBorrows);
 //approving borrow requests
-router.patch("/:borrow_id/approve", adminGuard, approveBorrowRequest);
+router.patch("/:borrower_id/approve", adminGuard, approveBorrowRequest);
 
 export default router;
