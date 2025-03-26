@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
     <title>Register - Book Library</title>
 </head>
-
 <body>
     <header>
         <h1>📚 Book Library</h1>
@@ -15,10 +13,11 @@
 
     <div class="auth-container">
         <h2>Create an Account</h2>
+        <div id="error-message" class="error-message"></div>
         <form id="register-form">
             <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" placeholder="Choose a username" required>
+                <label for="username">Full Name</label>
+                <input type="text" id="username" placeholder="Enter your full name" required>
             </div>
             <div class="form-group">
                 <label for="email">Email</label>
@@ -32,6 +31,32 @@
                 <label for="confirm-password">Confirm Password</label>
                 <input type="password" id="confirm-password" placeholder="Confirm your password" required>
             </div>
+            <div class="form-group">
+                <label>Select User Role</label>
+                <div class="role-selection">
+                    <div class="role-option" data-role="3">
+                        <input type="radio" name="role" value="3" id="borrower-role">
+                        <label for="borrower-role">
+                            <strong>Borrower</strong>
+                            <small>Read and borrow books</small>
+                        </label>
+                    </div>
+                    <div class="role-option" data-role="2">
+                        <input type="radio" name="role" value="2" id="librarian-role">
+                        <label for="librarian-role">
+                            <strong>Librarian</strong>
+                            <small>Manage books (Requires Approval)</small>
+                        </label>
+                    </div>
+                    <div class="role-option" data-role="1">
+                        <input type="radio" name="role" value="1" id="admin-role">
+                        <label for="admin-role">
+                            <strong>Admin</strong>
+                            <small>Full system control (Requires Approval)</small>
+                        </label>
+                    </div>
+                </div>
+            </div>
             <div class="form-actions">
                 <button type="submit" class="primary-btn">Register</button>
             </div>
@@ -41,5 +66,4 @@
 
     <script type="module" src="./dist/register.js"></script>
 </body>
-
 </html>
