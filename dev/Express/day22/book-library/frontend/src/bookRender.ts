@@ -1,5 +1,6 @@
 import { fetchBooks } from "./api";
 import { Book } from "./types";
+import { AuthService } from "./authService";
 
 const bookList = document.getElementById("book-list")!;
 const cartItemsContainer = document.getElementById("cart-items")!;
@@ -16,10 +17,50 @@ const postBookBtn = document.getElementById("post-book-btn")!;
 const postBookModal = document.getElementById("post-book-modal")!;
 const closeBtn = document.querySelector(".close-btn")!;
 const postBookForm = document.getElementById("post-book-form")! as HTMLFormElement;
+const authButtonsContainer = document.querySelector(".auth-buttons")!;
 
 let books: Book[] = [];
 let cart: Book[] = JSON.parse(localStorage.getItem("cart") || "[]");
+function updateAuthUI() {
+    const user = AuthService.getCurrentUser();
+    
+    // Clear existing auth buttons
+    authButtonsContainer.innerHTML = '';
 
+    if (user) {
+        // Logged in state
+        const logoutBtn = document.createElement('button');
+        logoutBtn.textContent = 'Logout';
+        logoutBtn.addEventListener('click', () => {
+            AuthService.logout();
+            updateAuthUI();
+            window.location.href = 'login.html';
+        });
+        authButtonsContainer.appendChild(logoutBtn);
+
+        // Conditionally show Post a Book button
+        if (AuthService.hasRole('Librarian')) {
+            postBookBtn.style.display = 'block';
+        } else {
+            postBookBtn.style.display = 'none';
+        }
+    } else {
+        // Logged out state
+        const loginLink = document.createElement('a');
+        loginLink.href = 'login.html';
+        loginLink.textContent = 'Login';
+        
+        const registerBtn = document.createElement('button');
+        registerBtn.textContent = 'Register';
+        registerBtn.onclick = () => window.location.href = 'register.html';
+
+        authButtonsContainer.appendChild(loginLink);
+        authButtonsContainer.appendChild(registerBtn);
+
+        // Hide post book button
+        postBookBtn.style.display = 'none';
+    }
+}
 export async function loadBooks() {
     const filters: Record<string, string> = {};
 
@@ -46,16 +87,10 @@ function getUserRole(): string | null {
 }
 
 function renderBooks(books: Book[]) {
-    console.log("Rendering books:", books);
-
-    if (!bookList) {
-        console.error("Error: #book-list not found in HTML!");
-        return;
-    }
-    const userRole = getUserRole();
+    const user = AuthService.getCurrentUser();
+    
     bookList.innerHTML = "";
     books.forEach((book: Book) => {
-        console.log("Rendering books:", book);
         const bookElement = document.createElement("div");
         bookElement.classList.add("book");
         bookElement.innerHTML = `
@@ -68,8 +103,8 @@ function renderBooks(books: Book[]) {
             <p><strong>Price: </strong>$${book.price}</p>
             <button class="add-to-cart" data-id="${book.id}"> Add to Cart</button>
             <button class="buy-now" data-id="${book.id}">Buy Now</button>
-            ${userRole === "Librarian" ? `<button class="edit-book" data-id="${book.id}">✏️ Edit</button>` : ""}
-            ${userRole === "Admin" ? `<button class="delete-book" data-id="${book.id}">❌ Delete</button>` : ""}
+            ${user && user.role_name === 'Librarian' ? `<button class="edit-book" data-id="${book.id}">✏️ Edit</button>` : ''}
+            ${user && user.role_name === 'Admin' ? `<button class="delete-book" data-id="${book.id}">❌ Delete</button>` : ''}
         `;
         bookList.appendChild(bookElement);
     });
@@ -196,5 +231,8 @@ genreFilter.addEventListener("change", loadBooks);
 yearFilter.addEventListener("input", loadBooks);
 pageFilter.addEventListener("input", loadBooks);
 
-loadBooks();
+document.addEventListener('DOMContentLoaded', () => {
+    updateAuthUI();
+    loadBooks();
+});
 
