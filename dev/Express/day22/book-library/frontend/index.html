@@ -6,15 +6,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
     <title>Book Library</title>
+    <style>
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 40px;
+            background-color: white;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .logo-wrapper {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f3fcf3;
+            border: 1px solid #007bff;
+        }
+
+        .logo-wrapper img {
+            width: 30px;
+            height: 30px;
+            object-fit: contain;
+        }
+
+        .logo-container h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .auth-buttons {
+            margin-left: auto;
+        }
+    </style>
 </head>
 
 <body>
     <header>
-        <h1>📚 Book Library</h1>
+        <div class="logo-container">
+            <div class="logo-wrapper">
+                <img src="https://cdn.vectorstock.com/i/500p/05/68/book-icon-vector-7710568.avif"
+                    alt="Book Library Logo">
+            </div>
+            <h1>📚 Book Library</h1>
+        </div>
         <div class="auth-buttons">
-            <a href="login.html" id="login-link">Login</a>
-            <button id="register-btn" onclick="window.location.href='register.html'">Register</button>
-            <button id="post-book-btn">➕ Post a Book</button>
+            <button id="post-book-btn"><span>➕ </span>Post a Book</button>
         </div>
     </header>
 
@@ -28,7 +75,7 @@
                 <input type="text" id="book-genre" placeholder="Genre" required>
                 <input type="number" id="book-year" placeholder="Published Year" required>
                 <input type="number" id="book-pages" placeholder="Number of Pages" required>
-                <input type="text" id="book-image" placeholder="Image URL" required>                
+                <input type="text" id="book-image" placeholder="Image URL" required>
                 <button type="submit">Submit</button>
             </form>
         </div>
