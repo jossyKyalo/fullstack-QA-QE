@@ -63,3 +63,19 @@
   button:hover {
     opacity: 0.8;
   }
+  .success-message {
+    color: green;
+    margin-top: 15px;
+    text-align: center;
+  }
+  
+  .error-message {
+    color: red;
+    margin-top: 15px;
+    text-align: center;
+  }
+  
+  button:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
