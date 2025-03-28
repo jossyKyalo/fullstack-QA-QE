@@ -91,7 +91,7 @@ export class AppComponent implements OnInit {
         skills: this.skillsControls.map(control => control.value).filter(skill => skill.trim() !== '')
       };
 
-      // ✅ Call the method (now inside the class)
+       
       this.submitApplication(formData);
     } else {
       this.submissionStatus = 'error';
@@ -99,7 +99,7 @@ export class AppComponent implements OnInit {
     }
   }
 
-  // ✅ Move this inside the class
+  
   private submitApplication(applicationData: JobApplication) {
     this.simulateApiCall(applicationData).subscribe({
       next: (response) => {
