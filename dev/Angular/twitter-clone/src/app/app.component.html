@@ -1,0 +1,56 @@
+<div class="container">
+  <h1>Twitter Clone</h1>
+  
+  <!-- User Selection Dropdown -->
+  <div class="form-group">
+    <label>Select User:</label>
+    <select [(ngModel)]="selectedUserId" (change)="onUserChange()">
+      <option *ngFor="let user of users" [value]="user.id">{{ user.username }}</option>
+    </select>
+  </div>
+  
+  <!-- User Profile Display -->
+  <div class="profile-card" *ngIf="selectedUser">
+    <div class="profile-banner"></div>
+    <div class="profile-avatar">
+      <img 
+        src="https://api.dicebear.com/7.x/avataaars/svg?seed={{ selectedUserId }}" 
+        alt="User Avatar" 
+        class="avatar" 
+      />
+    </div>
+    <div class="profile-content">
+      <h2>{{ selectedUser.name }}</h2>
+      <p>{{ selectedUser.username }}</p>
+    </div>
+  </div>
+  
+  <!-- Posts Dropdown -->
+  <div class="form-group" *ngIf="posts.length > 0">
+    <label>Select Post:</label>
+    <select [(ngModel)]="selectedPostId" (change)="onPostChange()">
+      <option *ngFor="let post of posts" [value]="post.id">{{ post.title }}</option>
+    </select>
+  </div>
+  
+  <!-- Comments Section -->
+  <div *ngIf="comments.length > 0">
+    <h3>Comments</h3>
+    <div class="comments">
+      <div *ngFor="let comment of comments" class="comment">
+        <div class="comment-header">
+          <img 
+            src="https://api.dicebear.com/7.x/avataaars/svg?seed={{ comment.email }}" 
+            alt="Comment Avatar" 
+            class="comment-avatar" 
+          />
+          <div>
+            <h4>{{ comment.name }}</h4>
+            <small>{{ comment.email }}</small>
+          </div>
+        </div>
+        <p>{{ comment.body }}</p>
+      </div>
+    </div>
+  </div>
+</div>
