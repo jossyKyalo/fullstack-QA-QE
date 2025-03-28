@@ -1,0 +1,38 @@
+<div class="container">
+  <h1>Job Application Form</h1>
+  
+  <form [formGroup]="jobApplicationForm" (ngSubmit)="onSubmit()">
+    <div>
+      <label for="firstName">First Name:</label>
+      <input id="firstName" formControlName="firstName" type="text">
+      <div *ngIf="firstName.touched && firstName.errors?.['nameExists']" class="error">
+        This name already exists in our database.
+      </div>
+      <div *ngIf="firstName.touched && firstName.errors?.['required']" class="error">
+        First name is required.
+      </div>
+    </div>
+
+    <div>
+      <label for="lastName">Last Name:</label>
+      <input id="lastName" formControlName="lastName" type="text">
+      <div *ngIf="lastName.touched && lastName.errors?.['nameExists']" class="error">
+        This name already exists in our database.
+      </div>
+      <div *ngIf="lastName.touched && lastName.errors?.['required']" class="error">
+        Last name is required.
+      </div>
+    </div>
+
+    <div formArrayName="skills">
+      <label>Skills:</label>
+      <div *ngFor="let skill of skillsControls; let i = index">
+        <input [formControlName]="i" type="text" placeholder="Enter skill">
+        <button type="button" (click)="removeSkill(i)">Remove</button>
+      </div>
+      <button type="button" (click)="addSkill()">Add Skill</button>
+    </div>
+
+    <button type="submit" [disabled]="jobApplicationForm.invalid">Submit</button>
+  </form>
+</div>
