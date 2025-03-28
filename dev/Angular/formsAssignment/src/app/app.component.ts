@@ -4,6 +4,13 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators, Abs
 import { Observable, of } from 'rxjs';
 import { delay, map } from 'rxjs/operators';
 
+ 
+interface JobApplication {
+  firstName: string;
+  lastName: string;
+  skills: string[];
+}
+
 @Component({
   selector: 'app-root',
   imports: [CommonModule, ReactiveFormsModule],
@@ -14,6 +21,9 @@ import { delay, map } from 'rxjs/operators';
 export class AppComponent implements OnInit {
   title = 'formsAssignment';
   jobApplicationForm: FormGroup;
+
+  submissionStatus: 'idle' | 'submitting' | 'success' | 'error' = 'idle';
+  submissionMessage: string = '';
 
   constructor(private fb: FormBuilder) {
     this.jobApplicationForm = this.fb.group({
@@ -33,59 +43,87 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {}
 
-  // Getter for skills FormArray
   get skillsControls() {
     return (this.jobApplicationForm.get('skills') as FormArray).controls;
   }
 
-  // Getter for firstName
   get firstName() {
     return this.jobApplicationForm.get('firstName') ?? this.fb.control('');
   }
 
-  // Getter for lastName
   get lastName() {
     return this.jobApplicationForm.get('lastName') ?? this.fb.control('');
   }
 
-  // Add a new skill to the skills FormArray
   addSkill() {
     const skillsArray = this.jobApplicationForm.get('skills') as FormArray;
     skillsArray.push(this.fb.control('', Validators.required));
   }
 
-  // Remove a skill from the skills FormArray
   removeSkill(index: number) {
     const skillsArray = this.jobApplicationForm.get('skills') as FormArray;
     skillsArray.removeAt(index);
   }
 
-  // Custom async validator to check if name exists
   nameExistsValidator(): AsyncValidatorFn {
-    return (control: AbstractControl): Observable<{[key: string]: any} | null> => {
-      // Simulated database check
+    return (control: AbstractControl): Observable<{ [key: string]: any } | null> => {
       return this.checkNameExists(control.value).pipe(
         map(exists => exists ? { nameExists: true } : null)
       );
     };
   }
 
-  // Simulated database check method
   checkNameExists(name: string): Observable<boolean> {
-    // Simulating an API call with a predefined list of existing names
     const existingNames = ['John', 'Jane', 'Doe', 'Smith'];
-    
-    return of(existingNames.includes(name)).pipe(
-      // network delay
-      delay(1000)
-    );
+    return of(existingNames.includes(name)).pipe(delay(1000));
   }
 
-  // Form submission handler
   onSubmit() {
+    this.jobApplicationForm.markAllAsTouched();
+
     if (this.jobApplicationForm.valid) {
-      console.log(this.jobApplicationForm.value);
-      // submission logic 
+      this.submissionStatus = 'submitting';
+      this.submissionMessage = '';
+
+      const formData: JobApplication = {
+        firstName: this.jobApplicationForm.get('firstName')?.value,
+        lastName: this.jobApplicationForm.get('lastName')?.value,
+        skills: this.skillsControls.map(control => control.value).filter(skill => skill.trim() !== '')
+      };
+
+      // ✅ Call the method (now inside the class)
+      this.submitApplication(formData);
+    } else {
+      this.submissionStatus = 'error';
+      this.submissionMessage = 'Please correct the errors in the form.';
     }
+  }
+
+  // ✅ Move this inside the class
+  private submitApplication(applicationData: JobApplication) {
+    this.simulateApiCall(applicationData).subscribe({
+      next: (response) => {
+        this.submissionStatus = 'success';
+        this.submissionMessage = 'Application submitted successfully!';
+        
+        this.jobApplicationForm.reset();
+        while ((this.jobApplicationForm.get('skills') as FormArray).length !== 0) {
+          (this.jobApplicationForm.get('skills') as FormArray).removeAt(0);
+        }
+      },
+      error: (error) => {
+        this.submissionStatus = 'error';
+        this.submissionMessage = 'Failed to submit application. Please try again.';
+        console.error('Submission error:', error);
+      }
+    });
+  }
+
+  private simulateApiCall(data: JobApplication): Observable<any> {
+    return of({
+      status: 'success',
+      message: 'Application received',
+      data: data
+    }).pipe(delay(2000));
   }
 }

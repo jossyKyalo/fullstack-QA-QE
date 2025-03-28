@@ -33,6 +33,17 @@
       <button type="button" (click)="addSkill()">Add Skill</button>
     </div>
 
-    <button type="submit" [disabled]="jobApplicationForm.invalid">Submit</button>
+    <button type="submit" [disabled]="submissionStatus === 'submitting'">
+      {{ submissionStatus === 'submitting' ? 'Submitting...' : 'Submit' }}
+    </button>
+
+     
+    <div *ngIf="submissionMessage" 
+         [ngClass]="{
+           'success-message': submissionStatus === 'success',
+           'error-message': submissionStatus === 'error'
+         }">
+      {{ submissionMessage }}
+    </div>
   </form>
 </div>
