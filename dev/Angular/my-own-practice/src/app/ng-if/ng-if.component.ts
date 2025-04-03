@@ -1,9 +1,10 @@
 import { CommonModule, NgIf } from '@angular/common';
 import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-ng-if',
-  imports: [CommonModule, NgIf],
+  imports: [CommonModule, NgIf, FormsModule],
   templateUrl: './ng-if.component.html',
   styleUrl: './ng-if.component.css'
 })
