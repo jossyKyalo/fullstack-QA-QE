@@ -6,7 +6,7 @@
         
     </div>
     <div class="col-3">
-        <div class="bg-primary p-3">
+        <div class="bg-primary p-3" *ngIf="number1===number2">
             Div2
         </div>
     </div>
@@ -20,4 +20,7 @@
         <input type="text" [(ngModel)]="number1"/>
         <input type="text" [(ngModel)]="number2"/>
     </div>
+</div>
+<div class="col-2">
+    {{number1==number2}}
 </div>
