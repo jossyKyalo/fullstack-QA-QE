@@ -1,3 +1,6 @@
+--  Submitted BY: Josephine Kyalo
+-- email: kyalo.kathini22@students.dkut.ac.ke
+ 
  -- Create Employees Table (If Not Exists)
 CREATE TABLE IF NOT EXISTS employees (
     id SERIAL PRIMARY KEY,
