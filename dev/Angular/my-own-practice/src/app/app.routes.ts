@@ -22,5 +22,10 @@ export const routes: Routes = [
     {
         path: 'ng-style',
         component: NgStyleComponent
+    },
+    {
+        path: 'control-flow',
+        component: ControlFlowComponent
     }
+
 ];
