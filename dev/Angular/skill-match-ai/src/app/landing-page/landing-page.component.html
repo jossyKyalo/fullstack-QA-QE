@@ -28,11 +28,21 @@
 <!-- Testimonials Section -->
 <section class="testimonials">
   <div class="testimonial-card" *ngFor="let testimonial of testimonials">
-    <h3>{{ testimonial.name }}</h3>
-    <p class="role">{{ testimonial.role }}</p>
-    <p class="rating">Rating: <span *ngFor="let star of [1, 2, 3, 4, 5]">★</span></p>
-    <p class="comment-label">Comment:</p>
-    <p class="comment">{{ testimonial.comment }}</p>
+    <div class="profile">
+      <img src="https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="{{ testimonial.name }}" />
+      <div class="info">
+        <h3>{{ testimonial.name }}</h3>
+        <p class="role">{{ testimonial.role }}</p>
+      </div>
+    </div>
+    <div class="stars">
+      <ng-container *ngFor="let star of [1,2,3,4,5]; let i = index">
+        <span [class.filled]="i < testimonial.rating">★</span>
+      </ng-container>
+    </div>
+    <div class="comment-box">
+      <p class="comment">{{ testimonial.comment }}</p>
+    </div>
   </div>
 </section>
 
