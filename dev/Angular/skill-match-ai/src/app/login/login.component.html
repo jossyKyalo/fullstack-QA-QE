@@ -1,0 +1,78 @@
+<!-- login.component.html -->
+<div class="login-container">
+    <div class="login-card">
+      <div class="left-panel">
+        <div class="logo-container">
+          <div class="logo-box">
+            <img src="logo.png" alt="SkillMatch AI Logo">
+          </div>
+          <h1 class="brand-name">SkillMatch AI</h1>
+        </div>
+        
+        <div class="tagline">
+          <p>Revolutionizing recruitment by focusing on skills, not just
+          job titles. Find the perfect match for your career or team.</p>
+        </div>
+  
+        <div class="features">
+          <div class="feature-item">
+            <div class="check-icon">✓</div>
+            <span>AI-powered skill matching</span>
+          </div>
+          <div class="feature-item">
+            <div class="check-icon">✓</div>
+            <span>Personalized career recommendations</span>
+          </div>
+          <div class="feature-item">
+            <div class="check-icon">✓</div>
+            <span>Direct connection with employees</span>
+          </div>
+        </div>
+      </div>
+  
+      <div class="right-panel">
+        <h2 class="welcome-text">Welcome Back</h2>
+        <p class="login-subtitle">Log in to access your SkillMatch account</p>
+  
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input 
+              type="email" 
+              id="email" 
+              formControlName="email"
+              placeholder="Enter your email address"
+              [ngClass]="{'invalid': loginForm.get('email')?.invalid && loginForm.get('email')?.touched}"
+            >
+            <div class="error-message" *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
+              Please enter a valid email address
+            </div>
+          </div>
+  
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input 
+              type="password" 
+              id="password"
+              formControlName="password"
+              placeholder="••••••••" 
+              [ngClass]="{'invalid': loginForm.get('password')?.invalid && loginForm.get('password')?.touched}"
+            >
+            <div class="error-message" *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+              Password is required
+            </div>
+          </div>
+  
+          <div class="forgot-password">
+            <a (click)="forgotPassword()">Forgot password?</a>
+          </div>
+  
+          <button type="submit" class="login-button" [disabled]="loginForm.invalid">Log in</button>
+  
+          <div class="signup-prompt">
+            Don't have an account? <a (click)="navigateToSignUp()">Sign up</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>

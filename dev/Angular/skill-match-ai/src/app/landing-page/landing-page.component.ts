@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import {trigger,transition,style, animate,state} from '@angular/animations';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-landing-page',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './landing-page.component.html',
   styleUrl: './landing-page.component.css',
   animations: [
