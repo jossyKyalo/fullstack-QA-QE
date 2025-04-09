@@ -1,0 +1,168 @@
+<div class="admin-dashboard">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <!-- Logo and site title -->
+      <div class="sidebar-header">
+        <div class="logo-container">
+          <div class="logo">
+            {{ adminInitials }}
+          </div>
+        </div>
+        <div class="site-title">
+          <div class="title">{{ title }}</div>
+          <div class="subtitle">Admin Panel</div>
+        </div>
+      </div>
+      
+      <!-- Navigation items -->
+      <nav class="sidebar-nav">
+        <ul>
+          <li *ngFor="let item of navItems" 
+              [class.active]="currentNavItem === item.name"
+              (click)="navigateTo(item.name)">
+            <div class="nav-icon" [class]="item.icon"></div>
+            <span>{{ item.name }}</span>
+          </li>
+        </ul>
+      </nav>
+    </div>
+    
+    <!-- Main content -->
+    <div class="main-content">
+      <!-- Page header -->
+      <div class="page-header">
+        <div>
+          <h1>{{ currentNavItem }}</h1>
+          <p class="description">Manage all platform users: Job Seekers, Recruiters, and Admins</p>
+        </div>
+        <div class="header-actions">
+          <div class="notification-bell">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+            <span class="notification-dot"></span>
+          </div>
+          <button class="add-user-btn" (click)="addUser()">
+            <span class="plus-icon">+</span>
+            Add User
+          </button>
+        </div>
+      </div>
+      
+      <!-- Metrics cards -->
+      <div class="metrics-container">
+        <div class="metric-card">
+          <div class="metric-icon users-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+          </div>
+          <div class="metric-info">
+            <div class="metric-label">Total Users</div>
+            <div class="metric-value">{{ metrics.totalUsers.count.toLocaleString() }}</div>
+            <div class="metric-growth positive">
+              <span class="arrow">↑</span> {{ metrics.totalUsers.growth }}% this month
+            </div>
+          </div>
+        </div>
+        
+        <div class="metric-card">
+          <div class="metric-icon job-seekers-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </div>
+          <div class="metric-info">
+            <div class="metric-label">Job Seekers</div>
+            <div class="metric-value">{{ metrics.jobSeekers.count.toLocaleString() }}</div>
+            <div class="metric-growth positive">
+              <span class="arrow">↑</span> {{ metrics.jobSeekers.growth }}% this month
+            </div>
+          </div>
+        </div>
+        
+        <div class="metric-card">
+          <div class="metric-icon recruiters-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="8.5" cy="7" r="4"></circle>
+              <line x1="18" y1="8" x2="23" y2="13"></line>
+              <line x1="23" y1="8" x2="18" y2="13"></line>
+            </svg>
+          </div>
+          <div class="metric-info">
+            <div class="metric-label">Recruiters</div>
+            <div class="metric-value">{{ metrics.recruiters.count.toLocaleString() }}</div>
+            <div class="metric-growth positive">
+              <span class="arrow">↑</span> {{ metrics.recruiters.growth }}% this month
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Tabs and search -->
+      <div class="table-controls">
+        <div class="tabs">
+          <button *ngFor="let tab of tabs" 
+                  [class.active]="activeTab === tab"
+                  (click)="setActiveTab(tab)">
+            {{ tab }}
+          </button>
+        </div>
+        
+        <div class="search-box">
+          <input type="text" placeholder="Search users..." (input)="searchUsers($event)">
+          <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </div>
+      </div>
+      
+      <!-- Users table -->
+      <div class="users-table">
+        <div class="table-header">
+          <div class="user-column">User</div>
+          <div class="email-column">Email</div>
+          <div class="role-column">Role</div>
+          <div class="status-column">Status</div>
+          <div class="actions-column">Actions</div>
+        </div>
+        
+        <div class="table-body">
+          <div class="table-row" *ngFor="let user of users">
+            <div class="user-column">
+              <div class="user-avatar" [style.background-color]="user.color">
+                {{ user.initials }}
+              </div>
+              <span class="user-name">{{ user.name }}</span>
+            </div>
+            <div class="email-column">{{ user.email }}</div>
+            <div class="role-column">
+              <span [class]="getRoleClass(user.role)">{{ user.role }}</span>
+            </div>
+            <div class="status-column">
+              <span [class]="getStatusClass(user.status)">{{ user.status }}</span>
+            </div>
+            <div class="actions-column">
+              <button class="edit-btn" (click)="editUser(user.id)">Edit</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Pagination -->
+      <div class="pagination">
+        <button class="page-btn prev" [disabled]="currentPage === 1" (click)="changePage(currentPage - 1)">Prev</button>
+        <button class="page-btn" [class.active]="currentPage === 1" (click)="changePage(1)">1</button>
+        <button class="page-btn" [class.active]="currentPage === 2" (click)="changePage(2)">2</button>
+        <button class="page-btn" [class.active]="currentPage === 3" (click)="changePage(3)">3</button>
+        <button class="page-btn next" [disabled]="currentPage === totalPages" (click)="changePage(currentPage + 1)">Next</button>
+      </div>
+    </div>
+  </div>

@@ -1,0 +1,81 @@
+ <div class="admin-container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="logo-container">
+        <div class="logo">JP</div>
+        <div class="logo-text">
+          <div class="logo-title">JobPortal</div>
+          <div class="logo-subtitle">Admin Panel</div>
+        </div>
+      </div>
+      
+      <nav class="nav-menu">
+        <a class="nav-item">
+          <i class="fas fa-tachometer-alt"></i>
+          <span>Dashboard</span>
+        </a>
+        <a class="nav-item">
+          <i class="fas fa-users"></i>
+          <span>User Management</span>
+        </a>
+        <a class="nav-item active">
+          <i class="fas fa-shield-alt"></i>
+          <span>Security</span>
+        </a>
+        <a class="nav-item">
+          <i class="fas fa-brain"></i>
+          <span>AI Accuracy</span>
+        </a>
+        <a class="nav-item">
+          <i class="fas fa-chart-line"></i>
+          <span>System Performance</span>
+        </a>
+      </nav>
+    </div>
+  
+    <!-- Main Content -->
+    <div class="main-content">
+      <header class="admin-header">security-section admin</header>
+      
+      <div class="content-area">
+        <div class="security-header">
+          <div class="title-section">
+            <h1>Security Management</h1>
+            <p>Manage platform security and access controls</p>
+          </div>
+          
+          <div class="tabs">
+            <button [ngClass]="{'active': activeTab === 'roles'}" (click)="setActiveTab('roles')">Roles & Permissions</button>
+            <button [ngClass]="{'active': activeTab === 'metrics'}" (click)="setActiveTab('metrics')">Security Metrics</button>
+          </div>
+        </div>
+  
+        <div class="tab-content" *ngIf="activeTab === 'roles'">
+          <div class="role-management-header">
+            <h2>Role Management</h2>
+            <button class="btn-add-role" (click)="addNewRole()">Add New Role</button>
+          </div>
+  
+          <div class="roles-list">
+            <div class="role-card" *ngFor="let role of roles">
+              <div class="role-info">
+                <h3>{{ role.name }}</h3>
+                <div class="tags">
+                  <span class="tag" *ngFor="let tag of role.tags">{{ tag }}</span>
+                </div>
+              </div>
+              <div class="permissions-badge">
+                {{ role.permissions }} permissions
+              </div>
+            </div>
+          </div>
+        </div>
+  
+        <div class="tab-content" *ngIf="activeTab === 'metrics'">
+          <h2>Security Metrics</h2>
+          <p>Security metrics and analytics will be displayed here.</p>
+          <!-- Add security metrics content here -->
+        </div>
+      </div>
+    </div>
+  </div>
