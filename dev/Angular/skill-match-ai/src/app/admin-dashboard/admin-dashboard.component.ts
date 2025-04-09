@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
+import { Router} from '@angular/router';
 
 interface User {
   id: number;
@@ -13,11 +14,15 @@ interface User {
 
 @Component({
   selector: 'app-admin-dashboard',
+  standalone: true,
   imports: [CommonModule],
   templateUrl: './admin-dashboard.component.html',
   styleUrls: ['./admin-dashboard.component.css']
 })
 export class AdminDashboardComponent {
+
+  constructor(private router: Router) {}
+
   title = 'JobPortal';
   adminInitials = 'JP';
   currentNavItem = 'User Management';
@@ -39,11 +44,11 @@ export class AdminDashboardComponent {
   
   // Navigation items
   navItems = [
-    { name: 'Dashboard', icon: 'dashboard' },
-    { name: 'User Management', icon: 'people' },
-    { name: 'Security', icon: 'shield' },
-    { name: 'AI Accuracy', icon: 'analytics' },
-    { name: 'System Performance', icon: 'speed' }
+    { name: 'Dashboard', icon: 'dashboard', route: '/dashboard' },
+    { name: 'User Management', icon: 'people', route: '/users' },
+    { name: 'Security', icon: 'shield', route: '/security' },
+    { name: 'AI Accuracy', icon: 'analytics', route: '/ai-accuracy' },
+    { name: 'System Performance', icon: 'speed', route: '/systemPerformance' }
   ];
   
   // Tab options
@@ -68,8 +73,15 @@ export class AdminDashboardComponent {
   }
 
   navigateTo(item: string): void {
-    this.currentNavItem = item;
+    const navItem = this.navItems.find(nav => nav.name === item);
+    if (navItem) {
+      this.currentNavItem = navItem.name;
+      this.router.navigate([navItem.route]);
+    } else {
+      console.warn(`Navigation item '${item}' not found.`);
+    }
   }
+  
   
   changePage(page: number): void {
     if (page >= 1 && page <= this.totalPages) {

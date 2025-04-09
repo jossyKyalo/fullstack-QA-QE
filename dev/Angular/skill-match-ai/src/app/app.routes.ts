@@ -31,7 +31,7 @@ export const routes: Routes = [
         component:RecruiterDashboardComponent
     },
     {
-        path: 'admin',
+        path: 'users',
         component: AdminDashboardComponent
     },
     {
