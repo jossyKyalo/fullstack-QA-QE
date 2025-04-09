@@ -1,0 +1,146 @@
+<!-- system-performance.component.html -->
+<div class="admin-container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="logo-container">
+        <div class="logo">JP</div>
+        <div class="logo-text">
+          <div class="logo-title">JobPortal</div>
+          <div class="logo-subtitle">Admin Panel</div>
+        </div>
+      </div>
+      
+      <nav class="nav-menu">
+        <a class="nav-item" routerLink="/dashboard">
+          <i class="fas fa-tachometer-alt"></i>
+          <span>Dashboard</span>
+        </a>
+        <a class="nav-item" routerLink="/user-management">
+          <i class="fas fa-users"></i>
+          <span>User Management</span>
+        </a>
+        <a class="nav-item" routerLink="/security">
+          <i class="fas fa-shield-alt"></i>
+          <span>Security</span>
+        </a>
+        <a class="nav-item" routerLink="/ai-accuracy">
+          <i class="fas fa-brain"></i>
+          <span>AI Accuracy</span>
+        </a>
+        <a class="nav-item active" routerLink="/system-performance">
+          <i class="fas fa-chart-line"></i>
+          <span>System Performance</span>
+        </a>
+      </nav>
+    </div>
+  
+    <!-- Main Content -->
+    <div class="main-content">
+      <header class="admin-header">system-performance</header>
+      
+      <div class="content-area">
+        <div class="performance-header">
+          <h1>System Performance</h1>
+          <button class="refresh-btn">
+            <i class="fas fa-sync"></i> Refresh Data
+          </button>
+        </div>
+  
+        <!-- Metrics Cards -->
+        <div class="metrics-container">
+          <div class="metric-card" *ngFor="let metric of performanceMetrics">
+            <div class="metric-header">
+              <span class="metric-name">{{ metric.name }}</span>
+              <span class="status-indicator" [style.background-color]="getMetricStatusColor(metric.status)"></span>
+            </div>
+            <div class="metric-value">{{ metric.value }}</div>
+            <div class="metric-change" [ngClass]="metric.change.startsWith('-') ? 'decrease' : 'increase'" *ngIf="metric.change">
+              {{ metric.change }}
+              <i class="fas" [ngClass]="metric.change.startsWith('-') ? 'fa-caret-down' : 'fa-caret-up'"></i>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Performance Charts -->
+        <div class="charts-section">
+          <div class="chart-container">
+            <div class="chart-header">
+              <h2>CPU Usage (Last 7 Days)</h2>
+            </div>
+            <div class="line-chart">
+              <div class="chart-grid">
+                <div class="grid-line" *ngFor="let i of [0,1,2,3,4]"></div>
+              </div>
+              <div class="chart-data">
+                <svg class="chart-svg" viewBox="0 0 700 200" preserveAspectRatio="none">
+                    <polyline
+                    [attr.points]="cpuPolylinePoints"
+                    fill="none"
+                    stroke="#2196f3"
+                    stroke-width="3"
+                  />
+                  
+                </svg>
+              </div>
+            </div>
+          </div>
+  
+          <div class="chart-container">
+            <div class="chart-header">
+              <h2>Memory Usage (Last 7 Days)</h2>
+            </div>
+            <div class="line-chart">
+              <div class="chart-grid">
+                <div class="grid-line" *ngFor="let i of [0,1,2,3,4]"></div>
+              </div>
+              <div class="chart-data">
+                <svg class="chart-svg" viewBox="0 0 700 200" preserveAspectRatio="none">
+                    <polyline
+                    [attr.points]="memoryPolylinePoints"
+                    fill="none"
+                    stroke="#ff9800"
+                    stroke-width="3"
+                  />                  
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Server Status -->
+        <div class="server-status-section">
+          <h2>Server Status</h2>
+          <div class="server-list">
+            <div class="server-item" *ngFor="let server of serverStatuses">
+              <div class="server-info">
+                <div class="server-name">{{ server.name }}</div>
+                <div class="server-status" [style.color]="getStatusColor(server.status)">
+                  <i class="fas fa-circle"></i>
+                  {{ server.status | titlecase }}
+                </div>
+              </div>
+              <div class="server-details">
+                <div class="uptime">
+                  <span class="detail-label">Uptime:</span>
+                  <span class="detail-value">{{ server.uptime }}</span>
+                </div>
+                <div class="server-load">
+                  <span class="detail-label">Load:</span>
+                  <div class="load-bar-container">
+                    <div class="load-bar" [style.width.%]="server.load"
+                        [ngClass]="{
+                          'load-low': server.load < 70,
+                          'load-medium': server.load >= 70 && server.load < 90,
+                          'load-high': server.load >= 90
+                        }">
+                    </div>
+                  </div>
+                  <span class="load-percentage">{{ server.load }}%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
