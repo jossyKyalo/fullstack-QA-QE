@@ -1,71 +1,85 @@
 <!-- Header -->
 <header class="header">
-  <div class="logo">
-    <img src="./logo.png" alt="SkillMatch AI Logo" />
-    <span>SkillMatch AI</span>
-  </div>
-  <nav class="nav">
-    <a href="#">Home</a>
-    <a href="#">Find Jobs</a>
-    <a href="#">Hire Talent</a>
-  </nav>
-  <div class="auth-buttons">
-    <button class="login-btn">Login</button>
-    <button class="signup-btn">Sign Up</button>
-  </div>
-</header>
-
-<!-- Main Section -->
-<main class="main-section">
-  <h1>Match Skills <br />Not Job Titles</h1>
-  <p>Efficiently connect the right talent to the right roles</p>
-  <div class="action-buttons">
-    <button class="get-started-btn">Get started</button>
-    <button class="learn-more-btn">Learn more</button>
-  </div>
-</main>
-
-<!-- Testimonials Section -->
-<section class="testimonials">
-  <div class="testimonial-card" *ngFor="let testimonial of testimonials">
-    <div class="profile">
-      <img src="https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="{{ testimonial.name }}" />
-      <div class="info">
-        <h3>{{ testimonial.name }}</h3>
-        <p class="role">{{ testimonial.role }}</p>
-      </div>
-    </div>
-    <div class="stars">
-      <ng-container *ngFor="let star of [1,2,3,4,5]; let i = index">
-        <span [class.filled]="i < testimonial.rating">★</span>
-      </ng-container>
-    </div>
-    <div class="comment-box">
-      <p class="comment">{{ testimonial.comment }}</p>
-    </div>
-  </div>
-</section>
-
-<!-- Footer -->
-<footer class="footer">
-  <div class="footer-left">
     <div class="logo">
-      <img src="./logo.png" alt="SkillMatch AI Logo" />
+      <img src="logo.png" alt="SkillMatch AI Logo" />
       <span>SkillMatch AI</span>
     </div>
-    <p>AI-powered platform for skill-based job matching</p>
-  </div>
-  <div class="footer-right">
-    <div class="quick-links">
-      <h4>Quick Links</h4>
-      <a href="#">Jobs</a>
-      <a href="#">AI Chat</a>
-      <a href="#">Get started</a>
+    <nav class="nav">
+      <a href="#">Home</a>
+      <a href="#">Find Jobs</a>
+      <a href="#">Hire Talent</a>
+    </nav>
+    <div class="auth-buttons">
+      <button class="login-btn">Login</button>
+      <button class="signup-btn">Sign Up</button>
     </div>
-    <div class="legal-links">
-      <h4>© 2025 SkillMatch AI</h4>
-      <a href="#">Privacy Policy</a>
-      <a href="#">Terms of Service</a>
+  </header>
+  
+  <!-- Main Section -->
+  <main class="main-section">
+    <h1>Match Skills <br />Not Job Titles</h1>
+    <p>Efficiently connect the right talent to the right roles</p>
+    <div class="action-buttons">
+      <button class="get-started-btn">Get started</button>
+      <button class="learn-more-btn">Learn more</button>
     </div>
-  </div>
-</footer>
+  </main>
+  
+  <!-- Testimonials Section -->
+  <section class="testimonials">
+    <div class="testimonial-container">
+    <div class="testimonial-card" 
+    *ngFor="let testimonial of testimonials;  let i = index;" 
+    [@slideAnimation]="i === currentIndex ? 'visible' : 'hidden'"
+    [style.display]="i === currentIndex ? 'block' : 'none'">
+      <div class="profile">
+        <img src="https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="{{ testimonial.name }}" />
+        <div class="info">
+          <h3>{{ testimonial.name }}</h3>
+          <p class="role">{{ testimonial.role }}</p>
+        </div>
+      </div>
+      <div class="stars">
+        <ng-container *ngFor="let star of [1,2,3,4,5]; let i = index; ">
+          <span [class.filled]="i < testimonial.rating">★</span>
+        </ng-container>
+      </div>
+      <div class="comment-box">
+        <p class="comment">{{ testimonial.comment }}</p>
+      </div>
+    </div>
+    </div>
+    <div class="carousel-controls">
+        <button (click)="prevSlide()" class="carousel-control prev">&lt;</button>
+        <div class="carousel-indicators">
+          <span *ngFor="let _ of testimonials; let i = index; trackBy: trackByIndex" 
+                [class.active]="i === currentIndex"
+                (click)="currentIndex = i"></span>
+        </div>
+        <button (click)="nextSlide()" class="carousel-control next">&gt;</button>
+      </div>
+  </section>
+  
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-left">
+      <div class="logo">
+        <img src="logo.png" alt="SkillMatch AI Logo" />
+        <span>SkillMatch AI</span>
+      </div>
+      <p>AI-powered platform for skill-based job matching</p>
+    </div>
+    <div class="footer-right">
+      <div class="quick-links">
+        <h4>Quick Links</h4>
+        <a href="#">Jobs</a>
+        <a href="#">AI Chat</a>
+        <a href="#">Get started</a>
+      </div>
+      <div class="legal-links">
+        <h4>© 2025 SkillMatch AI</h4>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+      </div>
+    </div>
+  </footer>

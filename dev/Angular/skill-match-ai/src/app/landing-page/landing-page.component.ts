@@ -4,23 +4,26 @@ import {trigger,transition,style, animate,state} from '@angular/animations';
 
 @Component({
   selector: 'app-landing-page',
+  standalone: true,
   imports: [CommonModule],
   templateUrl: './landing-page.component.html',
   styleUrl: './landing-page.component.css',
-  // animations: [
-  //   trigger('slideAnimation', [
-  //     transition(':enter', [
-  //       style({ transform: 'translateX(100%)', opacity: 0 }),
-  //       animate('600ms ease-out', style({ transform: 'translateX(0)', opacity: 1 }))
-  //     ]),
-  //     transition(':leave', [
-  //       animate('600ms ease-in', style({ transform: 'translateX(-100%)', opacity: 0 }))
-  //     ])
-  //   ])
-  // ]
+  animations: [
+    trigger('slideAnimation', [
+      state('visible', style({ transform: 'translateX(0)', opacity: 1 })),
+      state('hidden', style({ transform: 'translateX(100%)', opacity: 0 })),
+      transition('hidden => visible', [
+        style({ transform: 'translateX(100%)', opacity: 0 }),
+        animate('600ms ease-out')
+      ]),
+      transition('visible => hidden', [
+        animate('600ms ease-in', style({ transform: 'translateX(-100%)', opacity: 0 }))
+      ])
+    ])
+  ]
 })
 
-export class LandingPageComponent implements OnInit{
+export class LandingPageComponent {
   currentIndex: number = 0;
 
   testimonials = [
@@ -50,7 +53,7 @@ export class LandingPageComponent implements OnInit{
     },
 
     {
-      names: 'Josephine',
+      name: 'Josephine Kyalo',
       role: 'ML lead - Microsoft',
       rating: 4,
       comment: 'I got to practice the same interview questions I was asked.'
@@ -63,7 +66,11 @@ export class LandingPageComponent implements OnInit{
     }
   ];
   ngOnInit(): void {
-    setInterval(() => this.nextSlide(), 4000);
+    if (typeof window !== 'undefined') {
+      setTimeout(() => {
+        setInterval(() => this.nextSlide(), 4000);
+      }, 0);
+    }
   }
 
   nextSlide() {
@@ -72,5 +79,8 @@ export class LandingPageComponent implements OnInit{
 
   prevSlide() {
     this.currentIndex = (this.currentIndex - 1 + this.testimonials.length) % this.testimonials.length;
+  }
+  trackByIndex(index: number): number {
+    return index;
   }
 }
