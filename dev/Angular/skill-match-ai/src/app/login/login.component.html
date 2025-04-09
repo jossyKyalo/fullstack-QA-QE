@@ -1,5 +1,4 @@
-<!-- login.component.html -->
-<div class="login-container">
+ <div class="login-container">
     <div class="login-card">
       <div class="left-panel">
         <div class="logo-container">
@@ -70,7 +69,7 @@
           <button type="submit" class="login-button" [disabled]="loginForm.invalid">Log in</button>
   
           <div class="signup-prompt">
-            Don't have an account? <a (click)="navigateToSignUp()">Sign up</a>
+            Don't have an account? <a  [routerLink]="['/register']">Sign up</a>
           </div>
         </form>
       </div>

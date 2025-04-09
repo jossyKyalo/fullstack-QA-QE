@@ -6,12 +6,12 @@
     </div>
     <nav class="nav">
       <a href="#">Home</a>
-      <a href="#">Find Jobs</a>
-      <a href="#">Hire Talent</a>
+      <a [routerLink]="['/jobSeeker']">Find Jobs</a>
+      <a [routerLink]="['/recruiter']">Hire Talent</a>
     </nav>
     <div class="auth-buttons">
       <button class="login-btn" [routerLink]="['/login']">Login</button>
-      <button class="signup-btn">Sign Up</button>
+      <button class="signup-btn" [routerLink]="['/register']">Sign Up</button>
     </div>
   </header>
   
@@ -20,7 +20,7 @@
     <h1>Match Skills <br />Not Job Titles</h1>
     <p>Efficiently connect the right talent to the right roles</p>
     <div class="action-buttons">
-      <button class="get-started-btn">Get started</button>
+      <button class="get-started-btn" [routerLink]="['/register']">Get started</button>
       <button class="learn-more-btn">Learn more</button>
     </div>
   </main>
@@ -72,9 +72,9 @@
     <div class="footer-right">
       <div class="quick-links">
         <h4>Quick Links</h4>
-        <a href="#">Jobs</a>
+        <a [routerLink]="['/jobSeeker']">Jobs</a>
         <a href="#">AI Chat</a>
-        <a href="#">Get started</a>
+        <a  [routerLink]="['/register']">Get started</a>
       </div>
       <div class="legal-links">
         <h4>© 2025 SkillMatch AI</h4>
