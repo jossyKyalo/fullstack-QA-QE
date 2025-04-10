@@ -71,17 +71,10 @@ export class AdminDashboardComponent {
   setActiveTab(tab: string): void {
     this.activeTab = tab;
   }
-
-  navigateTo(item: string): void {
-    const navItem = this.navItems.find(nav => nav.name === item);
-    if (navItem) {
-      this.currentNavItem = navItem.name;
-      this.router.navigate([navItem.route]);
-    } else {
-      console.warn(`Navigation item '${item}' not found.`);
-    }
+  navigateTo(item: any): void {
+    this.currentNavItem = item.name;
+    this.router.navigate([item.route]);
   }
-  
   
   changePage(page: number): void {
     if (page >= 1 && page <= this.totalPages) {

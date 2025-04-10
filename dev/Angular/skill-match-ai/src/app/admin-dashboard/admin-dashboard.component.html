@@ -18,7 +18,7 @@
         <nav class="sidebar-nav">
             <ul>
                 <li *ngFor="let item of navItems" [class.active]="currentNavItem === item.name"
-                    (click)="navigateTo(item.name)">
+                    (click)="navigateTo(item)">
                         <div class="nav-icon" [class]="item.icon"></div>
                         <span>{{ item.name }}</span>
                 </li>

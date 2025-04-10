@@ -1,5 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
+import { NavigationEnd, Router } from '@angular/router';
+import { filter } from 'rxjs/operators';
 
 interface PerformanceMetric {
   name: string;
@@ -14,6 +16,11 @@ interface ServerStatus {
   uptime: string;
   load: number;
 }
+interface NavItem {
+  name: string;
+  icon: string;
+  route: string;
+}
 
 @Component({
   selector: 'app-system-performance',
@@ -22,6 +29,31 @@ interface ServerStatus {
   styleUrls: ['./system-performance.component.css']
 })
 export class SystemPerformanceComponent implements OnInit {
+  currentRoute: string = '';
+  
+  navItems: NavItem[] = [
+    { name: 'Dashboard', icon: 'fa-tachometer-alt', route: '/users' },
+    { name: 'User Management', icon: 'fa-users', route: '/users' },
+    { name: 'Security', icon: 'fa-shield-alt', route: '/security' },
+    { name: 'AI Accuracy', icon: 'fa-brain', route: '/ai-accuracy' },
+    { name: 'System Performance', icon: 'fa-chart-line', route: '/systemPerformance' }
+  ];
+
+  constructor(private router: Router) {
+    // Keep track of the current route to highlight the active nav item
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe((event: NavigationEnd) => {
+      this.currentRoute = event.url;
+    });
+    
+    // Set initial route
+    this.currentRoute = this.router.url;
+  }
+
+  navigate(route: string) {
+    this.router.navigate([route]);
+  }
   performanceMetrics: PerformanceMetric[] = [
     { name: 'CPU Usage', value: '42%', status: 'good', change: '-3%' },
     { name: 'Memory Usage', value: '68%', status: 'warning', change: '+5%' },
@@ -38,8 +70,6 @@ export class SystemPerformanceComponent implements OnInit {
     { name: 'Job Queue Server', status: 'degraded', uptime: '3d 22h 45m', load: 92 },
     { name: 'Analytics Server', status: 'online', uptime: '16d 3h 51m', load: 30 }
   ];
-
-  constructor() { }
 
   ngOnInit(): void {
   }
