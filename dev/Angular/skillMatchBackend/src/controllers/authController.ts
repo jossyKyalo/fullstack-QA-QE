@@ -8,7 +8,7 @@ import { generateTokens } from "../utils/helpers/generateToken";
 
 // Register a new user (Job Seeker, Recruiter, Admin)
 export const registerUser = asyncHandler(async (req: UserRequest, res: Response, next: NextFunction) => {
-    const { full_name, email, password, user_type = 'job_seeker' } = req.body; // Default to 'job_seeker' if no role is provided
+    const { email, full_name, password, user_type = 'job_seeker' } = req.body; // Default to 'job_seeker' if no role is provided
 
     // Check if user exists
     const userExists = await pool.query("SELECT user_id FROM users WHERE email = $1", [email]);
@@ -23,8 +23,8 @@ export const registerUser = asyncHandler(async (req: UserRequest, res: Response,
 
     // Insert user into DB
     const newUser = await pool.query(
-        "INSERT INTO users (full_name, email, password, user_type) VALUES ($1, $2, $3, $4) RETURNING user_id, full_name, email, user_type",
-        [full_name, email, hashedPassword, user_type]
+        "INSERT INTO users (email, full_name, password, user_type) VALUES ($1, $2, $3, $4) RETURNING user_id, email, full_name, user_type",
+        [email, full_name, hashedPassword, user_type]
     );
 
     // Generate JWT Token
@@ -44,7 +44,7 @@ export const loginUser = asyncHandler(async (req: UserRequest, res: Response, ne
 
     // Check if user exists
     const userQuery = await pool.query(
-        `SELECT user_id, full_name, email, password, user_type, last_login
+        `SELECT user_id,  email, full_name, password, user_type, last_login
          FROM users WHERE email = $1`,
         [email]
     );
@@ -73,8 +73,8 @@ export const loginUser = asyncHandler(async (req: UserRequest, res: Response, ne
         message: "Login successful",
         user: {
             id: user.user_id,
-            full_name: user.full_name,
             email: user.email,
+            full_name: user.full_name,
             user_type: user.user_type
         }
     });
