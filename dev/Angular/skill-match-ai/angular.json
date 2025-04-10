@@ -24,9 +24,10 @@
               {
                 "glob": "**/*",
                 "input": "public"
-              }
+              } 
             ],
-            "styles": [
+            "styles": [ 
+              "node_modules/@fortawesome/fontawesome-free/css/all.min.css",
               "src/styles.css"
             ],
             "scripts": [],
@@ -89,7 +90,7 @@
                 "input": "public"
               }
             ],
-            "styles": [
+            "styles": [ 
               "src/styles.css"
             ],
             "scripts": []
