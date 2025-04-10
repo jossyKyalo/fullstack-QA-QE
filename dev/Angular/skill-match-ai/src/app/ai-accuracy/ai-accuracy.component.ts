@@ -1,5 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
+import { NavigationEnd, RouterModule, Router } from '@angular/router';
+import { filter } from 'rxjs/operators';
 
 interface MetricCard {
   name: string;
@@ -11,6 +13,11 @@ interface AccuracyIssue {
   count: number;
   color: string;
   trend?: string;  
+}
+interface NavItem {
+  name: string;
+  icon: string;
+  route: string;
 }
 
 @Component({
@@ -26,6 +33,30 @@ export class AIAccuracyComponent implements OnInit {
     { name: 'Recall', value: '91.2%' },
     { name: 'F1 Score', value: '90.2%' }
   ];
+  currentRoute: string = '';
+  
+  navItems: NavItem[] = [
+    { name: 'Dashboard', icon: 'fa-tachometer-alt', route: '/users' },
+    { name: 'User Management', icon: 'fa-users', route: '/users' },
+    { name: 'Security', icon: 'fa-shield-alt', route: '/security' },
+    { name: 'AI Accuracy', icon: 'fa-brain', route: '/ai-accuracy' },
+    { name: 'System Performance', icon: 'fa-chart-line', route: '/systemPerformance' }
+  ];
+  constructor(private router: Router) {
+    // Keep track of the current route to highlight the active nav item
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe((event: NavigationEnd) => {
+      this.currentRoute = event.url;
+    });
+    
+    // Set initial route
+    this.currentRoute = this.router.url;
+  }
+
+  navigate(route: string) {
+    this.router.navigate([route]);
+  }
 
   accuracyRating: string = 'Excellent';
   
@@ -38,7 +69,6 @@ export class AIAccuracyComponent implements OnInit {
     { type: 'Classification Error', count: 12, color: 'orange' }
   ];
 
-  constructor() { }
 
   ngOnInit(): void {
   }
