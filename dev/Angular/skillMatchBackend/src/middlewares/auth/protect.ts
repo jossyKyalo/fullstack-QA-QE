@@ -35,14 +35,10 @@ export const protect = asyncHandler(async (req: UserRequest, res: Response, next
 
         
         const userQuery = await pool.query(
-            `SELECT 
-                users.user_id, users.name, users.email, users.role_id, 
-                user_role.role_name 
-            FROM users 
-            JOIN user_role ON users.role_id = user_role.role_id 
-            WHERE users.user_id = $1`,
+            `SELECT user_id, email, full_name, user_type FROM users WHERE user_id = $1`,
             [decoded.userId]
         );
+        
 
         
         if (userQuery.rows.length === 0) {

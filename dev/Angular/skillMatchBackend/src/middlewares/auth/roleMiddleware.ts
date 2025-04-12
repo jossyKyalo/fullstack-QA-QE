@@ -18,10 +18,10 @@ export const roleGuard = (allowedRoles: string[]) =>
     });
 
  
-export const adminGuard = roleGuard(["Admin"]);
-export const librarianGuard = roleGuard(["Librarian"]);
-export const borrowerGuard = roleGuard(["Borrower"]);
+export const jobSeekerGuard = roleGuard(["job_seeker"]);
+export const recruiterGuard = roleGuard(["recruiter"]);
+export const adminGuard = roleGuard(["admin"]);
 
-//combined guards  
-export const staffGuard = roleGuard(["Admin", "Librarian"]);
-export const anyUserGuard = roleGuard(["Admin", "Librarian", "Borrower"]);
+// //combined guards  
+// export const staffGuard = roleGuard(["Admin", "Librarian"]);
+// export const anyUserGuard = roleGuard(["Admin", "Librarian", "Borrower"]);
