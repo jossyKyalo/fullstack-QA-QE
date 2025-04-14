@@ -1,4 +1,6 @@
-
+* {
+    font-family: Arial, sans-serif;
+}
 .onboarding-container {
     display: flex;
     justify-content: center;
