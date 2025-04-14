@@ -8,10 +8,9 @@ export interface User {
     name: string;
     email: string;
     password?: string;  
-    role_id: number;
-    role_name: string;
     created_at?: Date;
     updated_at?: Date;
+    last_login?: Date;
 }
 
 

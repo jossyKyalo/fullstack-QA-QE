@@ -1,0 +1,255 @@
+ 
+<div class="onboarding-container">
+    <div class="onboarding-card">
+      <div class="header">
+        <div class="logo-container">
+          <div class="logo-box">
+            <img src="logo.png" alt="SkillMatch AI Logo">
+          </div>
+          <h1 class="brand-name">SkillMatch AI</h1>
+        </div>
+        <div class="steps-indicator">
+          <div class="step" [ngClass]="{'active': currentStep === 1, 'complete': currentStep > 1}">1</div>
+          <div class="step-line" [ngClass]="{'complete': currentStep > 1}"></div>
+          <div class="step" [ngClass]="{'active': currentStep === 2, 'complete': currentStep > 2}">2</div>
+          <div class="step-line" [ngClass]="{'complete': currentStep > 2}"></div>
+          <div class="step" [ngClass]="{'active': currentStep === 3, 'complete': currentStep > 3}">3</div>
+          <div class="step-line" [ngClass]="{'complete': currentStep > 3}"></div>
+          <div class="step" [ngClass]="{'active': currentStep === 4}">4</div>
+        </div>
+      </div>
+  
+      <div class="step-content" *ngIf="currentStep === 1">
+        <h2>Professional Profile</h2>
+        <p>Tell us about your professional background</p>
+  
+        <form [formGroup]="profileForm">
+          <div class="form-group">
+            <label for="headline">Professional Headline</label>
+            <input 
+              type="text" 
+              id="headline" 
+              formControlName="headline"
+              placeholder="e.g. Frontend Developer with 5 years of experience">
+            <div class="hint">This will be displayed at the top of your profile</div>
+          </div>
+  
+          <div class="form-group">
+            <label for="currentCompany">Current Company</label>
+            <input 
+              type="text" 
+              id="currentCompany" 
+              formControlName="currentCompany"
+              placeholder="e.g. Google, Microsoft, or Self-employed">
+          </div>
+  
+          <div class="form-group">
+            <label for="yearsExperience">Years of Experience</label>
+            <input 
+              type="number" 
+              id="yearsExperience" 
+              formControlName="yearsExperience"
+              placeholder="0" 
+              min="0" 
+              max="50">
+          </div>
+  
+          <div class="photo-upload">
+            <label>Profile Picture</label>
+            <div class="upload-area" (click)="triggerPhotoUpload()">
+              <div *ngIf="!profilePhotoPreview" class="upload-placeholder">
+                <div class="upload-icon">
+                  <i class="fas fa-camera"></i>
+                </div>
+                <p>Click to upload photo</p>
+              </div>
+              <img *ngIf="profilePhotoPreview" [src]="profilePhotoPreview" class="photo-preview">
+            </div>
+            <input 
+              type="file" 
+              #photoUpload 
+              hidden 
+              accept="image/*" 
+              (change)="onPhotoSelected($event)">
+          </div>
+  
+          <div class="form-actions">
+            <button type="button" class="secondary-btn" (click)="skipStep()">Skip for now</button>
+            <button type="button" class="primary-btn" (click)="nextStep()" [disabled]="profileForm.invalid">Continue</button>
+          </div>
+        </form>
+      </div>
+  
+      <div class="step-content" *ngIf="currentStep === 2">
+        <h2>Skills</h2>
+        <p>Add skills to help us match you with the right opportunities</p>
+  
+        <form [formGroup]="skillsForm">
+          <div class="search-skills">
+            <label for="skillSearch">Add a skill</label>
+            <div class="search-container">
+              <input 
+                type="text" 
+                id="skillSearch" 
+                placeholder="Type to search skills..." 
+                [formControl]="skillSearchControl"
+                (input)="searchSkills()">
+              <div class="search-results" *ngIf="skillSearchResults.length > 0">
+                <div 
+                  class="skill-result" 
+                  *ngFor="let skill of skillSearchResults" 
+                  (click)="addSkill(skill)">
+                  {{skill.skill_name}}
+                </div>
+              </div>
+            </div>
+          </div>
+  
+          <div class="selected-skills" *ngIf="selectedSkills.length > 0">
+            <h3>Your Skills</h3>
+            <div class="skill-item" *ngFor="let skill of selectedSkills; let i = index">
+              <div class="skill-header">
+                <span class="skill-name">{{skill.skill_name}}</span>
+                <button type="button" class="remove-skill" (click)="removeSkill(i)">×</button>
+              </div>
+              <div class="proficiency-slider">
+                <label>Proficiency: {{skill.proficiency}}%</label>
+                <input 
+                  type="range" 
+                  min="1" 
+                  max="100" 
+                  [(ngModel)]="skill.proficiency" 
+                  [ngModelOptions]="{standalone: true}">
+              </div>
+            </div>
+          </div>
+  
+          <div class="empty-skills" *ngIf="selectedSkills.length === 0">
+            <div class="empty-icon">
+              <i class="fas fa-lightbulb"></i>
+            </div>
+            <p>Add skills to improve your job matches</p>
+          </div>
+  
+          <div class="form-actions">
+            <button type="button" class="secondary-btn" (click)="prevStep()">Back</button>
+            <button type="button" class="primary-btn" (click)="nextStep()">Continue</button>
+          </div>
+        </form>
+      </div>
+  
+      <div class="step-content" *ngIf="currentStep === 3">
+        <h2>Resume Upload</h2>
+        <p>Upload your resume to help us analyze your skills and experience</p>
+  
+        <form [formGroup]="resumeForm">
+          <div class="resume-upload">
+            <div class="upload-area" (click)="triggerResumeUpload()">
+              <div *ngIf="!resumeFileName" class="upload-placeholder">
+                <div class="upload-icon">
+                  <i class="fas fa-file-upload"></i>
+                </div>
+                <p>Click to upload your resume</p>
+                <span class="file-formats">PDF, DOCX, DOC (Max 5MB)</span>
+              </div>
+              <div *ngIf="resumeFileName" class="file-preview">
+                <div class="file-icon">
+                  <i class="fas fa-file-pdf"></i>
+                </div>
+                <div class="file-info">
+                  <span class="file-name">{{resumeFileName}}</span>
+                  <button type="button" class="remove-file" (click)="removeResume($event)">Remove</button>
+                </div>
+              </div>
+            </div>
+            <input 
+              type="file" 
+              #resumeUpload 
+              hidden 
+              accept=".pdf,.doc,.docx" 
+              (change)="onResumeSelected($event)">
+          </div>
+  
+          <div class="form-group">
+            <div class="checkbox-option">
+              <input 
+                type="checkbox" 
+                id="extractSkills" 
+                formControlName="extractSkills">
+              <label for="extractSkills">Extract skills from my resume</label>
+            </div>
+          </div>
+  
+          <div class="form-actions">
+            <button type="button" class="secondary-btn" (click)="prevStep()">Back</button>
+            <button type="button" class="primary-btn" (click)="nextStep()">Continue</button>
+          </div>
+        </form>
+      </div>
+  
+      <div class="step-content" *ngIf="currentStep === 4">
+        <h2>Work Preferences</h2>
+        <p>Tell us your preferences to find better matches</p>
+  
+        <form [formGroup]="preferencesForm">
+          <div class="form-group">
+            <label for="location">Preferred Location</label>
+            <input 
+              type="text" 
+              id="location" 
+              formControlName="location"
+              placeholder="e.g. Nairobi, Kenya or Remote">
+          </div>
+  
+          <div class="form-group">
+            <div class="checkbox-option">
+              <input 
+                type="checkbox" 
+                id="remotePreference" 
+                formControlName="remotePreference">
+              <label for="remotePreference">I'm open to remote work</label>
+            </div>
+          </div>
+  
+          <div class="form-group">
+            <label>Employment Type</label>
+            <div class="employment-types">
+              <div class="checkbox-option">
+                <input 
+                  type="checkbox" 
+                  id="fullTime" 
+                  formControlName="fullTime">
+                <label for="fullTime">Full-time</label>
+              </div>
+              <div class="checkbox-option">
+                <input 
+                  type="checkbox" 
+                  id="partTime" 
+                  formControlName="partTime">
+                <label for="partTime">Part-time</label>
+              </div>
+              <div class="checkbox-option">
+                <input 
+                  type="checkbox" 
+                  id="contract" 
+                  formControlName="contract">
+                <label for="contract">Contract</label>
+              </div>
+              <div class="checkbox-option">
+                <input 
+                  type="checkbox" 
+                  id="internship" 
+                  formControlName="internship">
+                <label for="internship">Internship</label>
+              </div>
+            </div>
+          </div>
+  
+          <div class="form-actions">
+            <button type="button" class="secondary-btn" (click)="prevStep()">Back</button>
+            <button type="button" class="primary-btn" (click)="completeOnboarding()">Finish Setup</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>

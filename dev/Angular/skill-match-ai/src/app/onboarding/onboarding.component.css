@@ -1,0 +1,385 @@
+
+.onboarding-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f5f7fa;
+    padding: 20px;
+  }
+  
+  .onboarding-card {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 800px;
+    overflow: hidden;
+  }
+  
+  .header {
+    padding: 20px 30px;
+    border-bottom: 1px solid #e6e9f0;
+  }
+  
+  .logo-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .logo-box {
+    width: 40px;
+    height: 40px;
+    margin-right: 12px;
+  }
+  
+  .logo-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  
+  .brand-name {
+    font-size: 22px;
+    font-weight: 600;
+    color: #2563eb;
+    margin: 0;
+  }
+  
+  .steps-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+  }
+  
+  .step {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #e6e9f0;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  
+  .step.active {
+    background-color: #2563eb;
+    color: white;
+  }
+  
+  .step.complete {
+    background-color: #10b981;
+    color: white;
+  }
+  
+  .step-line {
+    flex: 1;
+    height: 2px;
+    background-color: #e6e9f0;
+    margin: 0 10px;
+  }
+  
+  .step-line.complete {
+    background-color: #10b981;
+  }
+  
+  .step-content {
+    padding: 30px;
+  }
+  
+  h2 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0 0 8px 0;
+  }
+  
+  .step-content p {
+    color: #64748b;
+    margin: 0 0 30px 0;
+  }
+  
+  .form-group {
+    margin-bottom: 24px;
+  }
+  
+  label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #475569;
+    margin-bottom: 8px;
+  }
+  
+  input[type="text"],
+  input[type="number"] {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+  }
+  
+  input[type="text"]:focus,
+  input[type="number"]:focus {
+    border-color: #2563eb;
+    outline: none;
+  }
+  
+  .hint {
+    font-size: 12px;
+    color: #94a3b8;
+    margin-top: 4px;
+  }
+  
+  .photo-upload, .resume-upload {
+    margin-bottom: 24px;
+  }
+  
+  .upload-area {
+    border: 2px dashed #cbd5e1;
+    border-radius: 8px;
+    padding: 30px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.3s;
+  }
+  
+  .upload-area:hover {
+    border-color: #2563eb;
+  }
+  
+  .upload-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .upload-icon {
+    width: 50px;
+    height: 50px;
+    background-color: #f1f5f9;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    font-size: 20px;
+    color: #64748b;
+  }
+  
+  .file-formats {
+    font-size: 12px;
+    color: #94a3b8;
+    margin-top: 8px;
+  }
+  
+  .photo-preview {
+    max-width: 150px;
+    max-height: 150px;
+    border-radius: 8px;
+  }
+  
+  .file-preview {
+    display: flex;
+    align-items: center;
+  }
+  
+  .file-icon {
+    font-size: 30px;
+    color: #f97316;
+    margin-right: 16px;
+  }
+  
+  .file-info {
+    text-align: left;
+  }
+  
+  .file-name {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+  
+  .remove-file {
+    background: none;
+    border: none;
+    color: #ef4444;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 0;
+  }
+  
+  .checkbox-option {
+    display: flex;
+    align-items: center;
+  }
+  
+  .checkbox-option input[type="checkbox"] {
+    margin-right: 10px;
+  }
+  
+  .employment-types {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  
+  .form-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 40px;
+  }
+  
+  .primary-btn, .secondary-btn {
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .primary-btn {
+    background-color: #2563eb;
+    color: white;
+    border: none;
+  }
+  
+  .primary-btn:hover {
+    background-color: #1d4ed8;
+  }
+  
+  .primary-btn:disabled {
+    background-color: #94a3b8;
+    cursor: not-allowed;
+  }
+  
+  .secondary-btn {
+    background-color: transparent;
+    color: #64748b;
+    border: 1px solid #cbd5e1;
+  }
+  
+  .secondary-btn:hover {
+    background-color: #f1f5f9;
+  }
+  
+  /* Skills section styles */
+  .search-container {
+    position: relative;
+  }
+  
+  .search-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: white;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 10;
+  }
+  
+  .skill-result {
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .skill-result:hover {
+    background-color: #f1f5f9;
+  }
+  
+  .selected-skills {
+    margin-top: 30px;
+  }
+  
+  .selected-skills h3 {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 16px;
+  }
+  
+  .skill-item {
+    background-color: #f8fafc;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  
+  .skill-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  
+  .skill-name {
+    font-weight: 500;
+  }
+  
+  .remove-skill {
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: #64748b;
+    cursor: pointer;
+  }
+  
+  .proficiency-slider {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .proficiency-slider label {
+    margin-bottom: 8px;
+  }
+  
+  .proficiency-slider input[type="range"] {
+    width: 100%;
+  }
+  
+  .empty-skills {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 0;
+    background-color: #f8fafc;
+    border-radius: 8px;
+  }
+  
+  .empty-icon {
+    font-size: 24px;
+    color: #94a3b8;
+    margin-bottom: 16px;
+  }
+  
+  .empty-skills p {
+    color: #64748b;
+    margin: 0;
+  }
+  
+  @media (max-width: 600px) {
+    .employment-types {
+      grid-template-columns: 1fr;
+    }
+    
+    .form-actions {
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .form-actions button {
+      width: 100%;
+    }
+  }

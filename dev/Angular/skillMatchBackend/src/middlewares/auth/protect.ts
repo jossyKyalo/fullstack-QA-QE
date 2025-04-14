@@ -31,12 +31,12 @@ export const protect = asyncHandler(async (req: UserRequest, res: Response, next
         }
 
         
-        const decoded = jwt.verify(token, process.env.JWT_SECRET) as { userId: string; roleId: number };
+        const decoded = jwt.verify(token, process.env.JWT_SECRET) as { user_id: string; user_type: string };
 
         
         const userQuery = await pool.query(
             `SELECT user_id, email, full_name, user_type FROM users WHERE user_id = $1`,
-            [decoded.userId]
+            [decoded.user_id]
         );
         
 
