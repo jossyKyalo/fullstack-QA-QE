@@ -8,6 +8,7 @@ import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.compo
 import { SecurityManagementComponent } from './security-management/security-management.component';
 import { AIAccuracyComponent } from './ai-accuracy/ai-accuracy.component';
 import { SystemPerformanceComponent } from './system-performance/system-performance.component';
+import { OnboardingComponent } from './onboarding/onboarding.component';
 
 export const routes: Routes = [
     {
@@ -21,6 +22,10 @@ export const routes: Routes = [
     {
         path: 'register',
         component: RegisterComponent
+    },
+    {
+        path:'onboarding',
+        component: OnboardingComponent
     },
     {
         path:'jobSeeker',
