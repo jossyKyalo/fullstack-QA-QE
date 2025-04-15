@@ -4,12 +4,12 @@ import asyncHandler from "../asyncHandler";
 
 export const roleGuard = (allowedRoles: string[]) => 
     asyncHandler(async (req: UserRequest, res: Response, next: NextFunction) => {
-        if (!req.user || !req.user.role_name) {
+        if (!req.user || !req.user.user_type) {
             res.status(403).json({ message: "Access denied: Insufficient permissions" });
             return
         }
         
-        if (!allowedRoles.includes(req.user.role_name)) {
+        if (!allowedRoles.includes(req.user.user_type)) {
             res.status(403).json({ message: "Access denied: Insufficient permissions" });
             return
         }

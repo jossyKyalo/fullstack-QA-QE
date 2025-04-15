@@ -168,15 +168,25 @@ export class OnboardingComponent implements OnInit {
   }
 
   completeOnboarding(): void {
+    // Get the profile photo if it exists
+    let profilePhoto = null;
+    if (this.profilePhotoPreview) {
+      // Extract the file from the element
+      profilePhoto = this.photoUpload.nativeElement.files[0];
+    }
+  
     const onboardingData = {
       profile: this.profileForm.value,
       skills: this.selectedSkills,
       resume: this.resumeFile,
+      profilePhoto: profilePhoto,
       preferences: this.preferencesForm.value
     };
+    
     console.log('Onboarding data:', onboardingData);
     this.onboardingService.saveOnboardingData(onboardingData).subscribe(
-      () => {
+      (response) => {
+        console.log('Onboarding complete:', response);
         this.router.navigate(['/jobSeeker']);
       },
       error => {
@@ -184,4 +194,5 @@ export class OnboardingComponent implements OnInit {
       }
     );
   }
+  
 }
