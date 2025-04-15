@@ -29,8 +29,21 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
-app.use("/api/onboarding", onboardingRoutes);
- 
+app.use("/api", onboardingRoutes);
+// Dummy skill search
+app.get('/api/skills/search', (req, res) => {
+  const term = (req.query.term as string)?.toLowerCase();
+  const skills = ['JavaScript', 'Java', 'Python', 'Angular', 'React'];
+
+  const filtered = skills.filter(skill => skill.toLowerCase().includes(term));
+  res.json(filtered);
+});
+
+// Dummy skill extraction
+app.post('/api/skills/extract', (req, res) => {
+  const { resumeText } = req.body;
+  res.json({ extractedSkills: ['JavaScript', 'Teamwork', 'Problem Solving'] });
+});
 
 // Root Route
 app.get("/", (req, res) => {
