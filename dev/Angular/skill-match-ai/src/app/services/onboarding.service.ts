@@ -10,6 +10,7 @@ export class OnboardingService {
   private apiUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) { }
+  
 
   saveOnboardingData(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/onboarding`, this.prepareFormData(data));

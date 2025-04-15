@@ -3,6 +3,7 @@ import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, 
 import { Router } from '@angular/router';
 import { OnboardingService } from '../services/onboarding.service';
 import { CommonModule } from '@angular/common';
+import { HttpClientModule } from '@angular/common/http';
 
 interface Skill {
   skill_id: number;
@@ -13,7 +14,7 @@ interface Skill {
 
 @Component({
   selector: 'app-onboarding',
-  imports:[CommonModule, FormsModule, ReactiveFormsModule],
+  imports:[CommonModule, FormsModule, ReactiveFormsModule, HttpClientModule],
   standalone: true,
   templateUrl: './onboarding.component.html',
   styleUrls: ['./onboarding.component.css']
@@ -170,7 +171,7 @@ export class OnboardingComponent implements OnInit {
   completeOnboarding(): void {
     // Get the profile photo if it exists
     let profilePhoto = null;
-    if (this.profilePhotoPreview) {
+    if (this.profilePhotoPreview && this.photoUpload?.nativeElement) {
       // Extract the file from the element
       profilePhoto = this.photoUpload.nativeElement.files[0];
     }
