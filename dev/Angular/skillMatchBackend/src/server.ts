@@ -6,9 +6,9 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import authRoutes from "@app/routes/authRoutes";
 import userRoutes from "@app/routes/userRoutes";
-import bookRoutes from "@app/routes/bookRoutes";
-import borrowRoutes from "@app/routes/borrowRoutes";
 import pool from "@app/config/db.config";  
+import onboardingRoutes from "./routes/onboarding.routes";
+import bodyParser from "body-parser";
 
 
 dotenv.config();
@@ -23,16 +23,18 @@ app.use(cors({
     origin: "http://localhost:4200", 
     methods: "GET, PUT, DELETE",
     credentials: true }));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
-app.use("/api/books", bookRoutes);
-app.use("/api/borrow", borrowRoutes);
+app.use("/api/onboarding", onboardingRoutes);
+ 
 
 // Root Route
 app.get("/", (req, res) => {
-  res.send("Library Management System API is running...");
+  res.send("SkillMatch.ai is ready to match your skills...");
 });
 
 // Database Connection Test
