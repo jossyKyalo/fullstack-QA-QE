@@ -1,4 +1,3 @@
- 
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
@@ -14,8 +13,9 @@ import { HttpClient } from '@angular/common/http';
 })
 export class RegisterComponent {
   registerForm: FormGroup;
-  userType: string = 'job_seeker';  
-  
+  userType: string = 'job_seeker';
+  errorMessage: string | null = null; // To display registration errors
+
   constructor(
     private fb: FormBuilder,
     private router: Router,
@@ -30,11 +30,11 @@ export class RegisterComponent {
       validators: this.passwordMatchValidator
     });
   }
-  
+
   passwordMatchValidator(formGroup: FormGroup) {
     const password = formGroup.get('password')?.value;
     const confirmPassword = formGroup.get('confirmPassword')?.value;
-    
+
     if (password !== confirmPassword) {
       formGroup.get('confirmPassword')?.setErrors({ passwordMismatch: true });
       return { passwordMismatch: true };
@@ -43,11 +43,11 @@ export class RegisterComponent {
       return null;
     }
   }
-  
+
   setUserType(type: string): void {
     this.userType = type;
   }
-  
+
   onSubmit(): void {
     if (this.registerForm.valid) {
       const formData = {
@@ -56,24 +56,29 @@ export class RegisterComponent {
         password: this.registerForm.value.password,
         user_type: this.userType // e.g., 'job_seeker'
       };
-  
+
       this.http.post('http://localhost:4000/api/auth/register', formData, { withCredentials: true })
         .subscribe({
           next: (res: any) => {
             console.log('✅ Registration successful:', res);
-            this.router.navigate(['/login']);
+            if (this.userType === 'job_seeker') {
+              // Redirect job seekers to onboarding
+              this.router.navigate(['/onboarding']);
+            } else {
+              // Redirect recruiters or admins to login (or another route)
+              this.router.navigate(['/login']);
+            }
           },
           error: (err) => {
             console.error('❌ Registration failed:', err);
+            this.errorMessage = err.error?.message || 'Registration failed. Please try again.';
           }
         });
-  
     } else {
       this.registerForm.markAllAsTouched();
     }
   }
-  
-  
+
   navigateToLogin(): void {
     this.router.navigate(['/login']);
   }

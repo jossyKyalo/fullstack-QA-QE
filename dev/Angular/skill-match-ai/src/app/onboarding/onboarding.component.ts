@@ -14,6 +14,7 @@ interface Skill {
 @Component({
   selector: 'app-onboarding',
   imports:[CommonModule, FormsModule, ReactiveFormsModule],
+  standalone: true,
   templateUrl: './onboarding.component.html',
   styleUrls: ['./onboarding.component.css']
 })
@@ -124,24 +125,20 @@ export class OnboardingComponent implements OnInit {
     this.resumeUpload.nativeElement.value = '';
   }
 
+   
   searchSkills(): void {
     const searchTerm = this.skillSearchControl.value;
     if (searchTerm && searchTerm.length >= 2) {
-      const mockSkills: Skill[] = [
-        { skill_id: 1, skill_name: 'JavaScript', category: 'technical' },
-        { skill_id: 2, skill_name: 'React', category: 'technical' },
-        { skill_id: 3, skill_name: 'UI/UX Design', category: 'technical' },
-        { skill_id: 4, skill_name: 'Project Management', category: 'soft' }
-      ];
-      this.skillSearchResults = mockSkills.filter(skill =>
-        skill.skill_name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-        !this.selectedSkills.some(s => s.skill_id === skill.skill_id)
-      );
+      this.onboardingService.getSkillSuggestions(searchTerm).subscribe(skills => {
+        this.skillSearchResults = skills.filter(skill => 
+          !this.selectedSkills.some(s => s.skill_id === skill.skill_id)
+        );
+      });
     } else {
       this.skillSearchResults = [];
     }
   }
-
+  
   addSkill(skill: Skill): void {
     this.selectedSkills.push({
       ...skill,
@@ -156,19 +153,18 @@ export class OnboardingComponent implements OnInit {
   }
 
   extractSkillsFromResume(file: File): void {
-    console.log('Extracting skills from resume:', file.name);
-    setTimeout(() => {
-      const extractedSkills: Skill[] = [
-        { skill_id: 5, skill_name: 'TypeScript', category: 'technical', proficiency: 80 },
-        { skill_id: 6, skill_name: 'Angular', category: 'technical', proficiency: 75 },
-        { skill_id: 7, skill_name: 'Team Leadership', category: 'soft', proficiency: 85 }
-      ];
-      extractedSkills.forEach(skill => {
-        if (!this.selectedSkills.some(s => s.skill_id === skill.skill_id)) {
-          this.selectedSkills.push(skill);
-        }
-      });
-    }, 1000);
+    this.onboardingService.extractSkillsFromResume(file).subscribe(
+      extractedSkills => {
+        extractedSkills.forEach(skill => {
+          if (!this.selectedSkills.some(s => s.skill_id === skill.skill_id)) {
+            this.selectedSkills.push(skill);
+          }
+        });
+      },
+      error => {
+        console.error('Error extracting skills:', error);
+      }
+    );
   }
 
   completeOnboarding(): void {
