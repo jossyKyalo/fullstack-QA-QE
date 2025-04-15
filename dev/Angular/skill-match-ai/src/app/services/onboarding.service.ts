@@ -1,4 +1,3 @@
-// onboarding.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -13,7 +12,19 @@ export class OnboardingService {
   constructor(private http: HttpClient) { }
 
   saveOnboardingData(data: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/jobseekers/onboarding`, this.prepareFormData(data));
+    return this.http.post(`${this.apiUrl}/onboarding`, this.prepareFormData(data));
+  }
+
+   
+  getSkillSuggestions(searchTerm: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/skills/search?term=${searchTerm}`);
+  }
+
+  extractSkillsFromResume(resumeFile: File): Observable<any[]> {
+    const formData = new FormData();
+    formData.append('resume', resumeFile);
+    
+    return this.http.post<any[]>(`${this.apiUrl}/skills/extract`, formData);
   }
 
   private prepareFormData(data: any): FormData {
@@ -25,6 +36,11 @@ export class OnboardingService {
     formData.append('currentCompany', data.profile.currentCompany);
     formData.append('yearsExperience', data.profile.yearsExperience);
     
+    // Add profile photo if exists
+    if (data.profilePhoto) {
+      formData.append('profilePhoto', data.profilePhoto);
+    }
+    
     // Add skills data
     formData.append('skills', JSON.stringify(data.skills));
     
@@ -34,7 +50,7 @@ export class OnboardingService {
     }
     
     // Add preferences data
-    formData.append('location', data.preferences.location);
+    formData.append('preferredLocation', data.preferences.location);
     formData.append('remotePreference', data.preferences.remotePreference);
     
     // Add employment types
@@ -46,18 +62,5 @@ export class OnboardingService {
     formData.append('employmentTypes', JSON.stringify(employmentTypes));
     
     return formData;
-  }
-
-  // Method to get skill suggestions (would be used when typing in skill search)
-  getSkillSuggestions(searchTerm: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/skills/search?term=${searchTerm}`);
-  }
-
-  // Method to extract skills from resume
-  extractSkillsFromResume(resumeFile: File): Observable<any[]> {
-    const formData = new FormData();
-    formData.append('resume', resumeFile);
-    
-    return this.http.post<any[]>(`${this.apiUrl}/skills/extract`, formData);
   }
 }
