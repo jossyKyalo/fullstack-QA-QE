@@ -1,112 +1,110 @@
-import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { Router} from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { UserService } from '../services/user.service';
+
+interface Metrics {
+  totalUsers: { count: number; growth: number };
+  jobSeekers: { count: number; growth: number };
+  recruiters: { count: number; growth: number };
+}
 
 interface User {
-  id: number;
-  initials: string;
+  id: string;
   name: string;
   email: string;
-  role: 'Job Seeker' | 'Recruiter' | 'Admin';
-  status: 'Active' | 'Pending';
-  color?: string;
+  role: 'Admin' | 'Job Seeker' | 'Recruiter';
+  status: 'Active' | 'Inactive' | 'Pending';
+  initials: string;
+  color: string;
 }
 
 @Component({
   selector: 'app-admin-dashboard',
-  standalone: true,
-  imports: [CommonModule],
   templateUrl: './admin-dashboard.component.html',
   styleUrls: ['./admin-dashboard.component.css']
 })
-export class AdminDashboardComponent {
-
-  constructor(private router: Router) {}
-
-  title = 'JobPortal';
-  adminInitials = 'JP';
-  currentNavItem = 'User Management';
-  
-  metrics = {
-    totalUsers: {
-      count: 4829,
-      growth: 12
-    },
-    jobSeekers: {
-      count: 3541,
-      growth: 18
-    },
-    recruiters: {
-      count: 1275,
-      growth: 8
-    }
-  };
-  
-  // Navigation items
-  navItems = [
-    { name: 'Dashboard', icon: 'dashboard', route: '/dashboard' },
-    { name: 'User Management', icon: 'people', route: '/users' },
-    { name: 'Security', icon: 'shield', route: '/security' },
-    { name: 'AI Accuracy', icon: 'analytics', route: '/ai-accuracy' },
-    { name: 'System Performance', icon: 'speed', route: '/systemPerformance' }
-  ];
-  
-  // Tab options
-  tabs = ['All Users', 'Job Seekers', 'Recruiters', 'Admins'];
+export class AdminDashboardComponent implements OnInit {
+  title = 'SkillMatch AI';
+  adminInitials = 'JD'; // This should come from logged-in admin
+  currentNavItem = 'Users';
   activeTab = 'All Users';
-  
-  // Users data
-  users: User[] = [
-    { id: 1, initials: 'JS', name: 'James Smith', email: 'james@example.com', role: 'Job Seeker', status: 'Active', color: '#2196F3' },
-    { id: 2, initials: 'SR', name: 'Sarah Roberts', email: 'sarah@company.com', role: 'Recruiter', status: 'Active', color: '#FF5722' },
-    { id: 3, initials: 'MJ', name: 'Mike Johnson', email: 'mike@admin.com', role: 'Admin', status: 'Active', color: '#9C27B0' },
-    { id: 4, initials: 'AR', name: 'Alex Rivera', email: 'alex@example.com', role: 'Job Seeker', status: 'Pending', color: '#4CAF50' }
-  ];
-  
-  // Pagination
   currentPage = 1;
   totalPages = 3;
-  
-  // Methods
-  setActiveTab(tab: string): void {
-    this.activeTab = tab;
+
+  metrics: Metrics = {
+    totalUsers: { count: 0, growth: 0 },
+    jobSeekers: { count: 0, growth: 0 },
+    recruiters: { count: 0, growth: 0 }
+  };
+
+  navItems = [
+    { name: 'Dashboard', icon: 'dashboard-icon' },
+    { name: 'Users', icon: 'users-icon' },
+    { name: 'Settings', icon: 'settings-icon' }
+  ];
+
+  tabs = ['All Users', 'Job Seekers', 'Recruiters', 'Admins'];
+  users: User[] = [];
+
+  constructor(private userService: UserService) {}
+
+  ngOnInit() {
+    this.loadMetrics();
+    this.loadUsers();
   }
-  navigateTo(item: any): void {
-    this.currentNavItem = item.name;
-    this.router.navigate([item.route]);
+
+  async loadMetrics() {
+    try {
+      const metrics = await this.userService.getMetrics();
+      this.metrics = metrics;
+    } catch (error) {
+      console.error('Error loading metrics:', error);
+    }
   }
-  
-  changePage(page: number): void {
-    if (page >= 1 && page <= this.totalPages) {
+
+  async loadUsers(page: number = 1) {
+    try {
+      const response = await this.userService.getUsers(page);
+      this.users = response.users;
+      this.totalPages = response.totalPages;
       this.currentPage = page;
+    } catch (error) {
+      console.error('Error loading users:', error);
     }
   }
-  
+
+  navigateTo(item: any) {
+    this.currentNavItem = item.name;
+  }
+
+  addUser() {
+    // Implement user addition logic
+  }
+
+  editUser(userId: string) {
+    // Implement user editing logic
+  }
+
+  searchUsers(event: any) {
+    const searchTerm = event.target.value;
+    // Implement search logic
+  }
+
+  setActiveTab(tab: string) {
+    this.activeTab = tab;
+    this.loadUsers(1); // Reset to first page when changing tabs
+  }
+
+  changePage(page: number) {
+    if (page >= 1 && page <= this.totalPages) {
+      this.loadUsers(page);
+    }
+  }
+
   getRoleClass(role: string): string {
-    switch(role) {
-      case 'Job Seeker': return 'job-seeker-role';
-      case 'Recruiter': return 'recruiter-role';
-      case 'Admin': return 'admin-role';
-      default: return '';
-    }
+    return `role-badge ${role.toLowerCase().replace(' ', '-')}`;
   }
-  
+
   getStatusClass(status: string): string {
-    return status === 'Active' ? 'active-status' : 'pending-status';
-  }
-  
-  addUser(): void {
-    console.log('Adding new user');
-    // Implementation  
-  }
-  
-  editUser(userId: number): void {
-    console.log('Editing user with ID:', userId);
-    // Implementation  
-  }
-  
-  searchUsers(event: any): void {
-    console.log('Searching for:', event.target.value);
-    // Implementation  
+    return `status-badge ${status.toLowerCase()}`;
   }
 }
