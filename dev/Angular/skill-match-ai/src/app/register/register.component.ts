@@ -64,9 +64,11 @@ export class RegisterComponent {
             if (this.userType === 'job_seeker') {
               // Redirect job seekers to onboarding
               this.router.navigate(['/onboarding']);
-            } else {
-              // Redirect recruiters or admins to login (or another route)
-              this.router.navigate(['/login']);
+            } else if(this.userType==='admin'){
+              //admins to admin dashboard
+              this.router.navigate(['/users']);
+            }else{
+              this.router.navigate(['/users']);
             }
           },
           error: (err) => {
