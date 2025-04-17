@@ -3,7 +3,7 @@ import pool from "../config/db.config";
 import asyncHandler from "../middlewares/asyncHandler";
 import bcrypt from "bcryptjs";
 import { UserRequest } from "../utils/types/userTypes";
-import { AnyARecord } from "dns";
+ 
 
 // Get metrics for dashboard (Admin only)
 export const getMetrics = asyncHandler(async (req: Request, res: Response) => {
@@ -217,3 +217,20 @@ export const deleteUser = asyncHandler(async (req: Request, res: Response) => {
 
     res.status(200).json({ message: "User deleted successfully" });
 });
+
+export const searchUsers = asyncHandler(async (req: Request, res: Response) => {
+    const query = req.query.q as string;
+  
+    if (!query) {
+      res.status(400);
+      throw new Error('Search query parameter "q" is required');
+    }
+  
+    const result = await pool.query(`
+      SELECT * FROM users
+      WHERE full_name ILIKE $1 OR email ILIKE $1
+    `, [`%${query}%`]);
+  
+    res.json(result.rows);
+  });
+  
