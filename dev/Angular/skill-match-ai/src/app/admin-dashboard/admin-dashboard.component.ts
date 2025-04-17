@@ -1,36 +1,24 @@
 import { Component, OnInit } from '@angular/core';
-import { UserService } from '../services/user.service';
+import {User, Metrics, UserService } from '../services/user.service';
 import { CommonModule } from '@angular/common';
-
-interface Metrics {
-  totalUsers: { count: number; growth: number };
-  jobSeekers: { count: number; growth: number };
-  recruiters: { count: number; growth: number };
-}
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: 'Admin' | 'Job Seeker' | 'Recruiter';
-  status: 'Active' | 'Inactive' | 'Pending';
-  initials: string;
-  color: string;
-}
+ 
 
 @Component({
   selector: 'app-admin-dashboard',
+  standalone: true,
   imports: [CommonModule],
   templateUrl: './admin-dashboard.component.html',
   styleUrls: ['./admin-dashboard.component.css']
 })
 export class AdminDashboardComponent implements OnInit {
   title = 'SkillMatch AI';
-  adminInitials = 'JD'; // This should come from logged-in admin
+  adminInitials = 'JD';
   currentNavItem = 'Users';
   activeTab = 'All Users';
   currentPage = 1;
   totalPages = 3;
+  isLoading = false;
+  error: string | null = null;
 
   metrics: Metrics = {
     totalUsers: { count: 0, growth: 0 },
@@ -56,21 +44,29 @@ export class AdminDashboardComponent implements OnInit {
 
   async loadMetrics() {
     try {
+      this.isLoading = true;
       const metrics = await this.userService.getMetrics();
       this.metrics = metrics;
     } catch (error) {
       console.error('Error loading metrics:', error);
+      this.error = 'Failed to load metrics';
+    } finally {
+      this.isLoading = false;
     }
   }
 
   async loadUsers(page: number = 1) {
     try {
-      const response = await this.userService.getUsers(page);
+      this.isLoading = true;
+      const response = await this.userService.getUsers(page, 10, this.activeTab);
       this.users = response.users;
       this.totalPages = response.totalPages;
       this.currentPage = page;
     } catch (error) {
       console.error('Error loading users:', error);
+      this.error = 'Failed to load users';
+    } finally {
+      this.isLoading = false;
     }
   }
 
@@ -78,22 +74,35 @@ export class AdminDashboardComponent implements OnInit {
     this.currentNavItem = item.name;
   }
 
-  addUser() {
-    // Implement user addition logic
+  async addUser() {
+    // Will be implemented in a separate component
+    console.log('Add user clicked');
   }
 
-  editUser(userId: string) {
-    // Implement user editing logic
+  async editUser(userId: string) {
+    // Will be implemented in a separate component
+    console.log('Edit user clicked:', userId);
   }
 
-  searchUsers(event: any) {
+  async searchUsers(event: any) {
     const searchTerm = event.target.value;
-    // Implement search logic
+    if (searchTerm.length >= 3) {
+      try {
+        const response = await this.userService.searchUsers(searchTerm);
+        this.users = response.users;
+        this.totalPages = response.totalPages;
+        this.currentPage = 1;
+      } catch (error) {
+        console.error('Error searching users:', error);
+      }
+    } else if (searchTerm.length === 0) {
+      this.loadUsers(1);
+    }
   }
 
   setActiveTab(tab: string) {
     this.activeTab = tab;
-    this.loadUsers(1); // Reset to first page when changing tabs
+    this.loadUsers(1);
   }
 
   changePage(page: number) {

@@ -1,10 +1,12 @@
 import express from "express";
 import {
+    getMetrics,
     getUsers,
     getUserById,
     createUser,
     updateUser,
-    deleteUser
+    deleteUser,
+    searchUsers,
 } from "../controllers/userController";
 import { protect } from "../middlewares/auth/protect";
 import { adminGuard } from "../middlewares/auth/roleMiddleware";
@@ -22,5 +24,7 @@ router.get("/", adminGuard, getUsers); // Get all users (Admin)
 router.get("/:user_id", adminGuard, getUserById); // Get a user by ID (Admin)
 router.put("/:user_id", adminGuard, updateUser); // Update user (Admin)
 router.delete("/:user_id", adminGuard, deleteUser); // Delete user (Admin)
+router.get('/metrics', getMetrics);// admin dashboard metrics
+router.get('/search', searchUsers); // Search users (Admin)
 
 export default router;
