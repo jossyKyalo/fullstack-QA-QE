@@ -16,8 +16,8 @@
       
       <div class="job-item" *ngFor="let job of jobRecommendations">
         <div class="job-title">{{job.title}}</div>
-        <div class="job-company">{{job.company}} · {{job.location}}</div>
-        <button class="apply-button" (click)="applyForJob(job.title)">Apply Now</button>
+        <div class="job-company">{{job.company_name}} · {{job.location}}</div>
+        <button class="apply-button" (click)="applyForJob(job)">{{ job.applied ? 'Applied' : 'Apply Now' }}</button>
       </div>
     </div>
   
@@ -25,13 +25,13 @@
     <div class="panel">
       <h2>Skills Assessment</h2>
       
-      <div class="skill-item" *ngFor="let skill of skills">
+      <div class="skill-item" *ngFor="let skill of userSkills">
         <div class="skill-header">
-          <span>{{skill.name}}</span>
-          <span>{{skill.percentage}}%</span>
+          <span>{{skill.skill_name}}</span>
+          <span>{{skill.proficiency_score}}%</span>
         </div>
         <div class="progress-bar">
-          <div class="progress-fill" [style.width.%]="skill.percentage"></div>
+          <div class="progress-fill" [style.width.%]="skill.proficiency_score"></div>
         </div>
       </div>
       
@@ -49,17 +49,17 @@
             <polyline points="14 2 14 8 20 8"></polyline>
           </svg>
         </div>
-        <div class="file-name">{{resumeAnalysis.fileName}}</div>
+        <div class="file-name">{{resumeAnalysis?.fileName}}</div>
       </div>
       
       <div class="analysis-item">
         <div class="analysis-label">Keyword Optimizations</div>
-        <div class="analysis-value">{{resumeAnalysis.keywordOptimization}}%</div>
+        <div class="analysis-value">{{resumeAnalysis?.keyword_optimization}}%</div>
       </div>
       
       <div class="analysis-item">
         <div class="analysis-label">Industry Alignment</div>
-        <div class="analysis-value high">{{resumeAnalysis.industryAlignment}}</div>
+        <div class="analysis-value high">{{resumeAnalysis?.industry_alignment}}</div>
       </div>
     </div>
   </div>
