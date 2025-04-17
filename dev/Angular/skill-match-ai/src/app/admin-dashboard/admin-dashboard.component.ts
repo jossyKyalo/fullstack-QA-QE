@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {User, Metrics, UserService } from '../services/user.service';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
  
 
 @Component({
@@ -11,9 +12,10 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./admin-dashboard.component.css']
 })
 export class AdminDashboardComponent implements OnInit {
+  constructor(private router: Router, private userService: UserService) {}
   title = 'SkillMatch AI';
-  adminInitials = 'JD';
-  currentNavItem = 'Users';
+  adminInitials = 'SA';
+  currentNavItem = 'User Management';
   activeTab = 'All Users';
   currentPage = 1;
   totalPages = 3;
@@ -27,15 +29,16 @@ export class AdminDashboardComponent implements OnInit {
   };
 
   navItems = [
-    { name: 'Dashboard', icon: 'dashboard-icon' },
-    { name: 'Users', icon: 'users-icon' },
-    { name: 'Settings', icon: 'settings-icon' }
+    { name: 'Dashboard', icon: 'dashboard', route: '/dashboard'},
+    { name: 'User Management', icon: 'people', route:'/users' },
+    { name: 'Security', icon: 'shield', route:'/security' },
+    { name: 'AI Accuracy', icon: 'analytics', route: '/ai-accuracy' },
+    { name: 'System Performance', icon: 'speed', route: 'systemPerformance' }
   ];
 
   tabs = ['All Users', 'Job Seekers', 'Recruiters', 'Admins'];
   users: User[] = [];
 
-  constructor(private userService: UserService) {}
 
   ngOnInit() {
     this.loadMetrics();
@@ -72,6 +75,7 @@ export class AdminDashboardComponent implements OnInit {
 
   navigateTo(item: any) {
     this.currentNavItem = item.name;
+    this.router.navigate([item.route]);
   }
 
   async addUser() {

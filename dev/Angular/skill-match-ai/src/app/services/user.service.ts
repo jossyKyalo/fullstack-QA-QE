@@ -36,7 +36,7 @@ export class UserService {
   constructor(private http: HttpClient) {}
 
   async getMetrics(): Promise<Metrics> {
-    return await firstValueFrom(this.http.get<Metrics>(`${this.apiUrl}/metrics`)) ;
+    return await firstValueFrom(this.http.get<Metrics>(`${this.apiUrl}/metrics`, { withCredentials: true })) ;
   }
 
   async getUsers(page: number = 1, limit: number = 10, role?: string): Promise<UserResponse> {
@@ -44,7 +44,7 @@ export class UserService {
     if (role && role !== 'All Users') {
       url += `&role=${role}`;
     }
-    return await firstValueFrom(this.http.get<UserResponse>(url));
+    return await firstValueFrom(this.http.get<UserResponse>(url, { withCredentials: true }));
   }
 
   async createUser(userData: {
@@ -53,7 +53,7 @@ export class UserService {
     password: string;
     user_type: string;
   }): Promise<User> {
-    return await firstValueFrom(this.http.post<User>(this.apiUrl, userData));
+    return await firstValueFrom(this.http.post<User>(this.apiUrl, userData, { withCredentials: true }));
   }
 
   async updateUser(userId: string, userData: {
@@ -61,14 +61,14 @@ export class UserService {
     full_name?: string;
     user_type?: string;
   }): Promise<User> {
-    return await firstValueFrom(this.http.put<User>(`${this.apiUrl}/${userId}`, userData));
+    return await firstValueFrom(this.http.put<User>(`${this.apiUrl}/${userId}`, userData, { withCredentials: true }));
   }
 
   async deleteUser(userId: string): Promise<{ message: string }> {
-    return await firstValueFrom(this.http.delete<{ message: string }>(`${this.apiUrl}/${userId}`));
+    return await firstValueFrom(this.http.delete<{ message: string }>(`${this.apiUrl}/${userId}`, { withCredentials: true }));
   }
 
   async searchUsers(searchTerm: string): Promise<UserResponse> {
-    return await firstValueFrom(this.http.get<UserResponse>(`${this.apiUrl}/search?q=${searchTerm}`));
+    return await firstValueFrom(this.http.get<UserResponse>(`${this.apiUrl}/search?q=${searchTerm}`, { withCredentials: true }));
   }
 }

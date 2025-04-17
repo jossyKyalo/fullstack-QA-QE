@@ -36,11 +36,11 @@ export class AIAccuracyComponent implements OnInit {
   currentRoute: string = '';
   
   navItems: NavItem[] = [
-    { name: 'Dashboard', icon: 'fa-tachometer-alt', route: '/users' },
-    { name: 'User Management', icon: 'fa-users', route: '/users' },
-    { name: 'Security', icon: 'fa-shield-alt', route: '/security' },
-    { name: 'AI Accuracy', icon: 'fa-brain', route: '/ai-accuracy' },
-    { name: 'System Performance', icon: 'fa-chart-line', route: '/systemPerformance' }
+    { name: 'Dashboard', icon: 'dashboard', route: '/users' },
+    { name: 'User Management', icon: 'people', route: '/users' },
+    { name: 'Security', icon: 'shield', route: '/security' },
+    { name: 'AI Accuracy', icon: 'analytics', route: '/ai-accuracy' },
+    { name: 'System Performance', icon: 'speed', route: '/systemPerformance' }
   ];
   constructor(private router: Router) {
     // Keep track of the current route to highlight the active nav item
