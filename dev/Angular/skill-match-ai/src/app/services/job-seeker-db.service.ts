@@ -52,7 +52,7 @@ export interface Job {
   job_id: number;
   company_id: number;
   company_name: string; // Joined field
-  title: string;
+  title: string | null;
   description: string;
   location: string;
   remote_option: boolean;
@@ -107,11 +107,12 @@ export interface EmploymentPreference {
 export interface ResumeAnalysis {
   jobseeker_id: number;
   resume_uploaded: boolean;
-  keyword_optimization: number;
-  industry_alignment: string;
+  keyword_optimization: number| null;
+  industry_alignment: string | null;
   extracted_skills: UserSkill[];
   improvement_suggestions: string[];
   last_updated: string;
+  fileName: string;
 }
 
 @Injectable({
@@ -458,6 +459,7 @@ export class JobSeekerDbService {
     return {
       jobseeker_id: jobseekerId,
       resume_uploaded: true,
+      fileName: 'resume.pdf', 
       keyword_optimization: 87,
       industry_alignment: 'High',
       extracted_skills: this.getMockUserSkills(1),

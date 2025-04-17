@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { UserService } from '../services/user.service';
+import { CommonModule } from '@angular/common';
 
 interface Metrics {
   totalUsers: { count: number; growth: number };
@@ -19,6 +20,7 @@ interface User {
 
 @Component({
   selector: 'app-admin-dashboard',
+  imports: [CommonModule],
   templateUrl: './admin-dashboard.component.html',
   styleUrls: ['./admin-dashboard.component.css']
 })
