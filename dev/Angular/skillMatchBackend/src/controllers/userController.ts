@@ -48,12 +48,16 @@ export const getUsers = asyncHandler(async (req: Request, res: Response) => {
     const offset = (page - 1) * limit;
     const userType = req.query.role as string;
 
-    let whereClause = '';
-    const values: any[] = [limit, offset];
+    let usersWhereClause = '';
+    let countWhereClause = '';
+    const usersValues: any[] = [limit, offset];
+    const countValues: any[] = [];
 
     if (userType && userType !== 'All Users') {
-        whereClause = "WHERE user_type = $3";
-        values.push(userType.toLowerCase());
+        usersWhereClause = "WHERE user_type = $3";
+        countWhereClause = "WHERE user_type = $1";
+        usersValues.push(userType.toLowerCase());
+        countValues.push(userType.toLowerCase());
     }
 
     const usersQuery = `
@@ -68,7 +72,7 @@ export const getUsers = asyncHandler(async (req: Request, res: Response) => {
                 ELSE 'Pending'
             END as status
         FROM users u
-        ${whereClause}
+        ${usersWhereClause}
         ORDER BY u.created_at DESC
         LIMIT $1 OFFSET $2
     `;
@@ -76,12 +80,12 @@ export const getUsers = asyncHandler(async (req: Request, res: Response) => {
     const countQuery = `
         SELECT COUNT(*) 
         FROM users 
-        ${whereClause}
+        ${countWhereClause}
     `;
 
     const [usersResult, countResult] = await Promise.all([
-        pool.query(usersQuery, values),
-        pool.query(countQuery, whereClause ? [userType.toLowerCase()] : [])
+        pool.query(usersQuery, usersValues),
+        pool.query(countQuery, countValues)
     ]);
 
     const transformedUsers = usersResult.rows.map(user => ({
