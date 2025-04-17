@@ -18,7 +18,7 @@ export const generateTokens = (res: Response, userId: string, role: string) => {
 
     try {
         // Generate short-lived access token (15 mins)
-        const accessToken = jwt.sign({ userId, role }, jwtSecret, { expiresIn: "15m" });
+        const accessToken = jwt.sign({ user_id: userId, user_type: role }, jwtSecret, { expiresIn: "15m" });
 
         // Generate long-lived refresh token (30 days)
         const refreshToken = jwt.sign({ userId }, refreshSecret, { expiresIn: "30d" });

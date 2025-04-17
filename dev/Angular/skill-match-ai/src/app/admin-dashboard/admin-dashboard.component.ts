@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {Inject, PLATFORM_ID, Component, OnInit } from '@angular/core';
 import {User, Metrics, UserService } from '../services/user.service';
-import { CommonModule } from '@angular/common';
+import {isPlatformBrowser, CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
  
 
@@ -12,7 +12,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./admin-dashboard.component.css']
 })
 export class AdminDashboardComponent implements OnInit {
-  constructor(private router: Router, private userService: UserService) {}
+  constructor(@Inject(PLATFORM_ID) private platformId: Object,private router: Router, private userService: UserService) {}
   title = 'SkillMatch AI';
   adminInitials = 'SA';
   currentNavItem = 'User Management';
@@ -41,8 +41,26 @@ export class AdminDashboardComponent implements OnInit {
 
 
   ngOnInit() {
+    if (isPlatformBrowser(this.platformId)) {
+      // safe to use document or window here
+      const el = document.getElementById('yourElementId');
+    }
+    console.log('Cookies present:', document.cookie ? 'Yes' : 'No');
+    console.log('Cookie content:', document.cookie);
     this.loadMetrics();
     this.loadUsers();
+  }
+  getRoleForTab(tab: string): string | undefined {
+    switch (tab) {
+      case 'Job Seekers':
+        return 'job_seeker';
+      case 'Recruiters':
+        return 'recruiter';
+      case 'Admins':
+        return 'admin';
+      default:
+        return undefined; // for 'All Users'
+    }
   }
 
   async loadMetrics() {
@@ -57,10 +75,12 @@ export class AdminDashboardComponent implements OnInit {
       this.isLoading = false;
     }
   }
+  
 
   async loadUsers(page: number = 1) {
     try {
       this.isLoading = true;
+      const role = this.getRoleForTab(this.activeTab);
       const response = await this.userService.getUsers(page, 10, this.activeTab);
       this.users = response.users;
       this.totalPages = response.totalPages;
