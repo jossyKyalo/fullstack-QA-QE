@@ -33,10 +33,10 @@ export interface Metrics {
 export class UserService {
   private apiUrl = `${environment.apiUrl}/users`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   async getMetrics(): Promise<Metrics> {
-    return await firstValueFrom(this.http.get<Metrics>(`${this.apiUrl}/metrics`, { withCredentials: true })) ;
+    return await firstValueFrom(this.http.get<Metrics>(`${this.apiUrl}/metrics`, { withCredentials: true }));
   }
 
   async getUsers(page: number = 1, limit: number = 10, role?: string): Promise<UserResponse> {
@@ -68,7 +68,11 @@ export class UserService {
     return await firstValueFrom(this.http.delete<{ message: string }>(`${this.apiUrl}/${userId}`, { withCredentials: true }));
   }
 
-  async searchUsers(searchTerm: string): Promise<UserResponse> {
-    return await firstValueFrom(this.http.get<UserResponse>(`${this.apiUrl}/search?q=${searchTerm}`, { withCredentials: true }));
+  async searchUsers(searchTerm: string, role?: string): Promise<UserResponse> {
+    let url = `${this.apiUrl}/search?q=${searchTerm}`;
+    if (role) {
+      url += `&role=${role}`;
+    }
+    return await firstValueFrom(this.http.get<UserResponse>(url, { withCredentials: true }));
   }
 }
