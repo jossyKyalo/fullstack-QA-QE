@@ -1,18 +1,19 @@
-import {Inject, PLATFORM_ID, Component, OnInit } from '@angular/core';
-import {User, Metrics, UserService } from '../services/user.service';
-import {isPlatformBrowser, CommonModule } from '@angular/common';
+import { Inject, PLATFORM_ID, Component, OnInit } from '@angular/core';
+import { User, Metrics, UserService } from '../services/user.service';
+import { isPlatformBrowser, CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
- 
+import { FormsModule } from '@angular/forms';
+
 
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './admin-dashboard.component.html',
   styleUrls: ['./admin-dashboard.component.css']
 })
 export class AdminDashboardComponent implements OnInit {
-  constructor(@Inject(PLATFORM_ID) private platformId: Object,private router: Router, private userService: UserService) {}
+  constructor(@Inject(PLATFORM_ID) private platformId: Object, private router: Router, private userService: UserService) { }
   title = 'SkillMatch AI';
   adminInitials = 'SA';
   currentNavItem = 'User Management';
@@ -29,9 +30,9 @@ export class AdminDashboardComponent implements OnInit {
   };
 
   navItems = [
-    { name: 'Dashboard', icon: 'dashboard', route: '/dashboard'},
-    { name: 'User Management', icon: 'people', route:'/users' },
-    { name: 'Security', icon: 'shield', route:'/security' },
+    { name: 'Dashboard', icon: 'dashboard', route: '/dashboard' },
+    { name: 'User Management', icon: 'people', route: '/users' },
+    { name: 'Security', icon: 'shield', route: '/security' },
     { name: 'AI Accuracy', icon: 'analytics', route: '/ai-accuracy' },
     { name: 'System Performance', icon: 'speed', route: 'systemPerformance' }
   ];
@@ -39,7 +40,26 @@ export class AdminDashboardComponent implements OnInit {
   tabs = ['All Users', 'Job Seekers', 'Recruiters', 'Admins'];
   users: User[] = [];
 
+  showAddUserModal = false;
+  newUser = {
+    full_name: '',
+    email: '',
+    password: '',
+    user_type: 'job_seeker' // Default value
+  };
 
+  showEditUserModal = false;
+  currentEditUser: {
+    id: string;
+    full_name: string;
+    email: string;
+    user_type: string;
+  } = {
+    id: '',
+    full_name: '',
+    email: '',
+    user_type: ''
+  };
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
       // safe to use document or window here
@@ -47,7 +67,7 @@ export class AdminDashboardComponent implements OnInit {
       console.log('Cookies present:', document.cookie ? 'Yes' : 'No');
       console.log('Cookie content:', document.cookie);
     }
-    
+
     this.loadMetrics();
     this.loadUsers();
   }
@@ -76,7 +96,7 @@ export class AdminDashboardComponent implements OnInit {
       this.isLoading = false;
     }
   }
-  
+
 
   async loadUsers(page: number = 1) {
     try {
@@ -100,15 +120,99 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   async addUser() {
-    // Will be implemented in a separate component
+    this.showAddUserModal = true;
     console.log('Add user clicked');
+  }
+  cancelAddUser() {
+    this.showAddUserModal = false;
+    // Reset form
+    this.newUser = {
+      full_name: '',
+      email: '',
+      password: '',
+      user_type: 'job_seeker'
+    };
+  }
+  
+  async submitNewUser() {
+    try {
+      await this.userService.createUser(this.newUser);
+      
+      // Close modal and reload users
+      this.showAddUserModal = false;
+      this.loadUsers(this.currentPage);
+      
+      //success message
+      console.log('User created successfully');
+    } catch (error) {
+      console.error('Error creating user:', error);
+      // Display error message to user
+    }
   }
 
   async editUser(userId: string) {
-    // Will be implemented in a separate component
-    console.log('Edit user clicked:', userId);
+    try {
+      // Find the user in the current list (for immediate display)
+      const user = this.users.find(u => u.id === userId);
+      
+      if (user) {
+        // Set up the edit form with current values
+        this.currentEditUser = {
+          id: user.id,
+          full_name: user.name, // Mapping from name to full_name
+          email: user.email,
+          user_type: user.role // Mapping from role to user_type
+        };
+        
+        // Show the modal
+        this.showEditUserModal = true;
+      }
+    } catch (error) {
+      console.error('Error setting up user edit:', error);
+    }
   }
-
+  cancelEditUser() {
+    this.showEditUserModal = false;
+  }
+  async updateUser() {
+    try {
+      await this.userService.updateUser(
+        this.currentEditUser.id, 
+        {
+          full_name: this.currentEditUser.full_name,
+          email: this.currentEditUser.email,
+          user_type: this.currentEditUser.user_type
+        }
+      );
+      
+      // Close modal and reload users
+      this.showEditUserModal = false;
+      this.loadUsers(this.currentPage);
+      
+      // Success message
+      console.log('User updated successfully');
+    } catch (error) {
+      console.error('Error updating user:', error);
+      // Display error message
+    }
+  }
+  async deleteUser() {
+    if (confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+      try {
+        await this.userService.deleteUser(this.currentEditUser.id);
+        
+        // Close modal and reload users
+        this.showEditUserModal = false;
+        this.loadUsers(this.currentPage);
+        
+        // Success message
+        console.log('User deleted successfully');
+      } catch (error) {
+        console.error('Error deleting user:', error);
+        // Display error message
+      }
+    }
+  }
   async searchUsers(event: any) {
     const searchTerm = event.target.value;
     if (searchTerm.length >= 3) {

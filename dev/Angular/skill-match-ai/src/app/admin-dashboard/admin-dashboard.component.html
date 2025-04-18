@@ -169,4 +169,84 @@
                 (click)="changePage(currentPage + 1)">Next</button>
         </div>
     </div>
+    <!-- Add this at the end of your template -->
+<div class="modal" *ngIf="showAddUserModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Add New User</h2>
+        <button class="close-btn" (click)="cancelAddUser()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="submitNewUser()">
+          <div class="form-group">
+            <label for="fullName">Full Name</label>
+            <input type="text" id="fullName" [(ngModel)]="newUser.full_name" name="fullName" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" [(ngModel)]="newUser.email" name="email" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" [(ngModel)]="newUser.password" name="password" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="userType">User Type</label>
+            <select id="userType" [(ngModel)]="newUser.user_type" name="userType" required>
+              <option value="job_seeker">Job Seeker</option>
+              <option value="recruiter">Recruiter</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+          
+          <div class="form-actions">
+            <button type="button" class="cancel-btn" (click)="cancelAddUser()">Cancel</button>
+            <button type="submit" class="submit-btn">Add User</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <!-- Add this at the end of your template (after the add user modal) -->
+<div class="modal" *ngIf="showEditUserModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Edit User</h2>
+        <button class="close-btn" (click)="cancelEditUser()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="updateUser()">
+          <div class="form-group">
+            <label for="editFullName">Full Name</label>
+            <input type="text" id="editFullName" [(ngModel)]="currentEditUser.full_name" name="fullName" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="editEmail">Email</label>
+            <input type="email" id="editEmail" [(ngModel)]="currentEditUser.email" name="email" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="editUserType">User Type</label>
+            <select id="editUserType" [(ngModel)]="currentEditUser.user_type" name="userType" required>
+              <option value="job_seeker">Job Seeker</option>
+              <option value="recruiter">Recruiter</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+          
+          <div class="form-actions">
+            <button type="button" class="delete-btn" (click)="deleteUser()">Delete User</button>
+            <div class="right-actions">
+              <button type="button" class="cancel-btn" (click)="cancelEditUser()">Cancel</button>
+              <button type="submit" class="submit-btn">Update User</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>
