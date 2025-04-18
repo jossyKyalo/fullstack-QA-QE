@@ -43,10 +43,11 @@ export class AdminDashboardComponent implements OnInit {
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
       // safe to use document or window here
-      const el = document.getElementById('yourElementId');
+      const el = document.getElementById('dashboard');
+      console.log('Cookies present:', document.cookie ? 'Yes' : 'No');
+      console.log('Cookie content:', document.cookie);
     }
-    console.log('Cookies present:', document.cookie ? 'Yes' : 'No');
-    console.log('Cookie content:', document.cookie);
+    
     this.loadMetrics();
     this.loadUsers();
   }
