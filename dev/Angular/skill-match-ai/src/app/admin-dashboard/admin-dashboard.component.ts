@@ -82,7 +82,7 @@ export class AdminDashboardComponent implements OnInit {
     try {
       this.isLoading = true;
       const role = this.getRoleForTab(this.activeTab);
-      const response = await this.userService.getUsers(page, 10, this.activeTab);
+      const response = await this.userService.getUsers(page, 10, role);
       this.users = response.users;
       this.totalPages = response.totalPages;
       this.currentPage = page;
@@ -113,7 +113,8 @@ export class AdminDashboardComponent implements OnInit {
     const searchTerm = event.target.value;
     if (searchTerm.length >= 3) {
       try {
-        const response = await this.userService.searchUsers(searchTerm);
+        const role = this.getRoleForTab(this.activeTab);
+        const response = await this.userService.searchUsers(searchTerm, role);
         this.users = response.users;
         this.totalPages = response.totalPages;
         this.currentPage = 1;
