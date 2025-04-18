@@ -224,17 +224,53 @@ export const deleteUser = asyncHandler(async (req: Request, res: Response) => {
 
 export const searchUsers = asyncHandler(async (req: Request, res: Response) => {
     const query = req.query.q as string;
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
   
     if (!query) {
       res.status(400);
       throw new Error('Search query parameter "q" is required');
     }
   
-    const result = await pool.query(`
-      SELECT * FROM users
-      WHERE full_name ILIKE $1 OR email ILIKE $1
-    `, [`%${query}%`]);
-  
-    res.json(result.rows);
+    const [usersResult, countResult] = await Promise.all([
+        pool.query(`
+          SELECT 
+            u.user_id,
+            u.full_name,
+            u.email,
+            u.user_type,
+            CASE 
+              WHEN u.last_login >= NOW() - INTERVAL '24 hours' THEN 'Active'
+              WHEN u.last_login >= NOW() - INTERVAL '7 days' THEN 'Inactive'
+              ELSE 'Pending'
+            END as status
+          FROM users u
+          WHERE u.full_name ILIKE $1 OR u.email ILIKE $1
+          LIMIT $2 OFFSET $3
+        `, [`%${query}%`, limit, (page - 1) * limit]),
+        
+        pool.query(`
+          SELECT COUNT(*) 
+          FROM users 
+          WHERE full_name ILIKE $1 OR email ILIKE $1
+        `, [`%${query}%`])
+      ]);
+      
+      const transformedUsers = usersResult.rows.map(user => ({
+        id: user.user_id,
+        name: user.full_name,
+        email: user.email,
+        role: user.user_type,
+        status: user.status,
+        initials: user.full_name.split(' ').map((n: any) => n[0]).join('').toUpperCase(),
+        color: `hsl(${Math.random() * 360}, 70%, 80%)`
+      }));
+      
+      res.status(200).json({
+        users: transformedUsers,
+        totalPages: Math.ceil(parseInt(countResult.rows[0].count) / limit),
+        currentPage: page,
+        total: parseInt(countResult.rows[0].count)
+      });
   });
   

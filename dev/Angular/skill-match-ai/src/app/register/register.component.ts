@@ -68,7 +68,7 @@ export class RegisterComponent {
               //admins to admin dashboard
               this.router.navigate(['/users']);
             }else{
-              this.router.navigate(['/users']);
+              this.router.navigate(['/login']);
             }
           },
           error: (err) => {
