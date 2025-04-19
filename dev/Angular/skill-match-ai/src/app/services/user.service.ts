@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environment';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, Observable, tap } from 'rxjs';
 
 
 interface UserResponse {
@@ -32,9 +32,25 @@ export interface Metrics {
 })
 export class UserService {
   private apiUrl = `${environment.apiUrl}/users`;
+  private authUrl = `${environment.apiUrl}/auth`;
 
   constructor(private http: HttpClient) { }
 
+  login(credentials: { email: string; password: string }): Observable<any> {
+    return this.http.post(`${this.authUrl}/login`, credentials, { withCredentials: true })
+      .pipe(
+        tap((response: any) => {
+
+          if (response.access_token) {
+            localStorage.setItem('auth_token', response.access_token);
+          }
+        })
+      );
+  }
+
+  logout(): Observable<any> {
+    return this.http.post(`${this.authUrl}/logout`, {}, { withCredentials: true });
+  }
   async getMetrics(): Promise<Metrics> {
     return await firstValueFrom(this.http.get<Metrics>(`${this.apiUrl}/metrics`, { withCredentials: true }));
   }

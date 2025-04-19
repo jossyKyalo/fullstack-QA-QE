@@ -4,7 +4,6 @@ import { isPlatformBrowser, CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
-
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
@@ -13,13 +12,18 @@ import { FormsModule } from '@angular/forms';
   styleUrls: ['./admin-dashboard.component.css']
 })
 export class AdminDashboardComponent implements OnInit {
-  constructor(@Inject(PLATFORM_ID) private platformId: Object, private router: Router, private userService: UserService) { }
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private router: Router,
+    private userService: UserService
+  ) {}
+
   title = 'SkillMatch AI';
   adminInitials = 'SA';
   currentNavItem = 'User Management';
   activeTab = 'All Users';
   currentPage = 1;
-  totalPages = 3;
+  totalPages = 1;  
   isLoading = false;
   error: string | null = null;
 
@@ -34,7 +38,7 @@ export class AdminDashboardComponent implements OnInit {
     { name: 'User Management', icon: 'people', route: '/users' },
     { name: 'Security', icon: 'shield', route: '/security' },
     { name: 'AI Accuracy', icon: 'analytics', route: '/ai-accuracy' },
-    { name: 'System Performance', icon: 'speed', route: 'systemPerformance' }
+    { name: 'System Performance', icon: 'speed', route: '/systemPerformance' }
   ];
 
   tabs = ['All Users', 'Job Seekers', 'Recruiters', 'Admins'];
@@ -45,7 +49,7 @@ export class AdminDashboardComponent implements OnInit {
     full_name: '',
     email: '',
     password: '',
-    user_type: 'job_seeker' // Default value
+    user_type: 'job_seeker'
   };
 
   showEditUserModal = false;
@@ -60,9 +64,9 @@ export class AdminDashboardComponent implements OnInit {
     email: '',
     user_type: ''
   };
+
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
-      // safe to use document or window here
       const el = document.getElementById('dashboard');
       console.log('Cookies present:', document.cookie ? 'Yes' : 'No');
       console.log('Cookie content:', document.cookie);
@@ -71,6 +75,7 @@ export class AdminDashboardComponent implements OnInit {
     this.loadMetrics();
     this.loadUsers();
   }
+
   getRoleForTab(tab: string): string | undefined {
     switch (tab) {
       case 'Job Seekers':
@@ -80,35 +85,36 @@ export class AdminDashboardComponent implements OnInit {
       case 'Admins':
         return 'admin';
       default:
-        return undefined; // for 'All Users'
+        return undefined;
     }
   }
 
   async loadMetrics() {
     try {
       this.isLoading = true;
+      this.error = null;
       const metrics = await this.userService.getMetrics();
-      this.metrics = metrics;
-    } catch (error) {
+      this.metrics = metrics || this.metrics;  
+    } catch (error: any) {
       console.error('Error loading metrics:', error);
-      this.error = 'Failed to load metrics';
+      this.error = 'Failed to load metrics: ' + (error.message || 'Unknown error');
     } finally {
       this.isLoading = false;
     }
   }
 
-
   async loadUsers(page: number = 1) {
     try {
       this.isLoading = true;
+      this.error = null;
       const role = this.getRoleForTab(this.activeTab);
       const response = await this.userService.getUsers(page, 10, role);
-      this.users = response.users;
-      this.totalPages = response.totalPages;
+      this.users = response.users || [];
+      this.totalPages = response.totalPages || 1;
       this.currentPage = page;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error loading users:', error);
-      this.error = 'Failed to load users';
+      this.error = 'Failed to load users: ' + (error.message || 'Unknown error');
     } finally {
       this.isLoading = false;
     }
@@ -119,13 +125,13 @@ export class AdminDashboardComponent implements OnInit {
     this.router.navigate([item.route]);
   }
 
-  async addUser() {
+  addUser() {
     this.showAddUserModal = true;
     console.log('Add user clicked');
   }
+
   cancelAddUser() {
     this.showAddUserModal = false;
-    // Reset form
     this.newUser = {
       full_name: '',
       email: '',
@@ -133,105 +139,104 @@ export class AdminDashboardComponent implements OnInit {
       user_type: 'job_seeker'
     };
   }
-  
+
   async submitNewUser() {
     try {
+      this.isLoading = true;
+      this.error = null;
       await this.userService.createUser(this.newUser);
-      
-      // Close modal and reload users
-      this.showAddUserModal = false;
-      this.loadUsers(this.currentPage);
-      
-      //success message
+      this.cancelAddUser();
+      await Promise.all([this.loadUsers(this.currentPage), this.loadMetrics()]);  
       console.log('User created successfully');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating user:', error);
-      // Display error message to user
+      this.error = 'Failed to create user: ' + (error.message || 'Unknown error');
+    } finally {
+      this.isLoading = false;
     }
   }
 
-  async editUser(userId: string) {
-    try {
-      // Find the user in the current list (for immediate display)
-      const user = this.users.find(u => u.id === userId);
-      
-      if (user) {
-        // Set up the edit form with current values
-        this.currentEditUser = {
-          id: user.id,
-          full_name: user.name, // Mapping from name to full_name
-          email: user.email,
-          user_type: user.role // Mapping from role to user_type
-        };
-        
-        // Show the modal
-        this.showEditUserModal = true;
-      }
-    } catch (error) {
-      console.error('Error setting up user edit:', error);
+  editUser(userId: string) {
+    const user = this.users.find(u => u.id === userId);
+    if (user) {
+      this.currentEditUser = {
+        id: user.id,
+        full_name: user.name,
+        email: user.email,
+        user_type: user.role
+      };
+      this.showEditUserModal = true;
     }
   }
+
   cancelEditUser() {
     this.showEditUserModal = false;
+    this.currentEditUser = { id: '', full_name: '', email: '', user_type: '' };
   }
+
   async updateUser() {
     try {
-      await this.userService.updateUser(
-        this.currentEditUser.id, 
-        {
-          full_name: this.currentEditUser.full_name,
-          email: this.currentEditUser.email,
-          user_type: this.currentEditUser.user_type
-        }
-      );
-      
-      // Close modal and reload users
-      this.showEditUserModal = false;
-      this.loadUsers(this.currentPage);
-      
-      // Success message
+      this.isLoading = true;
+      this.error = null;
+      await this.userService.updateUser(this.currentEditUser.id, {
+        full_name: this.currentEditUser.full_name,
+        email: this.currentEditUser.email,
+        user_type: this.currentEditUser.user_type
+      });
+      this.cancelEditUser();
+      await Promise.all([this.loadUsers(this.currentPage), this.loadMetrics()]);
       console.log('User updated successfully');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating user:', error);
-      // Display error message
+      this.error = 'Failed to update user: ' + (error.message || 'Unknown error');
+    } finally {
+      this.isLoading = false;
     }
   }
+
   async deleteUser() {
     if (confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
       try {
+        this.isLoading = true;
+        this.error = null;
         await this.userService.deleteUser(this.currentEditUser.id);
-        
-        // Close modal and reload users
-        this.showEditUserModal = false;
-        this.loadUsers(this.currentPage);
-        
-        // Success message
+        this.cancelEditUser();
+        await Promise.all([this.loadUsers(this.currentPage), this.loadMetrics()]);
         console.log('User deleted successfully');
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error deleting user:', error);
-        // Display error message
+        this.error = 'Failed to delete user: ' + (error.message || 'Unknown error');
+      } finally {
+        this.isLoading = false;
       }
     }
   }
+
   async searchUsers(event: any) {
     const searchTerm = event.target.value;
-    if (searchTerm.length >= 3) {
-      try {
+    try {
+      this.isLoading = true;
+      this.error = null;
+      if (searchTerm.length >= 3) {
         const role = this.getRoleForTab(this.activeTab);
         const response = await this.userService.searchUsers(searchTerm, role);
-        this.users = response.users;
-        this.totalPages = response.totalPages;
+        this.users = response.users || [];
+        this.totalPages = response.totalPages || 1;
         this.currentPage = 1;
-      } catch (error) {
-        console.error('Error searching users:', error);
+      } else if (searchTerm.length === 0) {
+        await this.loadUsers(1);
       }
-    } else if (searchTerm.length === 0) {
-      this.loadUsers(1);
+    } catch (error: any) {
+      console.error('Error searching users:', error);
+      this.error = 'Failed to search users: ' + (error.message || 'Unknown error');
+    } finally {
+      this.isLoading = false;
     }
   }
 
   setActiveTab(tab: string) {
     this.activeTab = tab;
+    this.currentPage = 1;
     this.loadUsers(1);
   }
 

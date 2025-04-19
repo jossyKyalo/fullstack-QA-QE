@@ -19,8 +19,8 @@
             <ul>
                 <li *ngFor="let item of navItems" [class.active]="currentNavItem === item.name"
                     (click)="navigateTo(item)">
-                        <div class="nav-icon" [class]="item.icon"></div>
-                        <span>{{ item.name }}</span>
+                    <div class="nav-icon" [class]="item.icon"></div>
+                    <span>{{ item.name }}</span>
                 </li>
             </ul>
         </nav>
@@ -65,8 +65,9 @@
                 <div class="metric-info">
                     <div class="metric-label">Total Users</div>
                     <div class="metric-value">{{ metrics.totalUsers.count.toLocaleString() }}</div>
-                    <div class="metric-growth positive">
-                        <span class="arrow">↑</span> {{ metrics.totalUsers.growth }}% this month
+                    <div class="metric-growth" [ngClass]="metrics.totalUsers.growth >= 0 ? 'positive' : 'negative'">
+                        <span class="arrow">{{ metrics.totalUsers.growth >= 0 ? '↑' : '↓' }}</span>
+                        {{ metrics.totalUsers.growth| number:'1.1-1' }}% this month
                     </div>
                 </div>
             </div>
@@ -82,8 +83,9 @@
                 <div class="metric-info">
                     <div class="metric-label">Job Seekers</div>
                     <div class="metric-value">{{ metrics.jobSeekers.count.toLocaleString() }}</div>
-                    <div class="metric-growth positive">
-                        <span class="arrow">↑</span> {{ metrics.jobSeekers.growth }}% this month
+                    <div class="metric-growth" [ngClass]="metrics.jobSeekers.growth >= 0 ? 'positive' : 'negative'">
+                        <span class="arrow">{{ metrics.jobSeekers.growth >= 0 ? '↑' : '↓' }}</span>
+                        {{ metrics.jobSeekers.growth | number:'1.1-1' }}% this month
                     </div>
                 </div>
             </div>
@@ -101,8 +103,9 @@
                 <div class="metric-info">
                     <div class="metric-label">Recruiters</div>
                     <div class="metric-value">{{ metrics.recruiters.count.toLocaleString() }}</div>
-                    <div class="metric-growth positive">
-                        <span class="arrow">↑</span> {{ metrics.recruiters.growth }}% this month
+                    <div class="metric-growth" [ngClass]="metrics.jobSeekers.growth >= 0 ? 'positive' : 'negative'">
+                        <span class="arrow">{{ metrics.recruiters.growth >= 0 ? '↑' : '↓' }}</span>
+                        {{ metrics.recruiters.growth | number:'1.1-1' }}% this month
                     </div>
                 </div>
             </div>
@@ -170,83 +173,84 @@
         </div>
     </div>
     <!-- Add this at the end of your template -->
-<div class="modal" *ngIf="showAddUserModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>Add New User</h2>
-        <button class="close-btn" (click)="cancelAddUser()">&times;</button>
-      </div>
-      <div class="modal-body">
-        <form (ngSubmit)="submitNewUser()">
-          <div class="form-group">
-            <label for="fullName">Full Name</label>
-            <input type="text" id="fullName" [(ngModel)]="newUser.full_name" name="fullName" required>
-          </div>
-          
-          <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" id="email" [(ngModel)]="newUser.email" name="email" required>
-          </div>
-          
-          <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" id="password" [(ngModel)]="newUser.password" name="password" required>
-          </div>
-          
-          <div class="form-group">
-            <label for="userType">User Type</label>
-            <select id="userType" [(ngModel)]="newUser.user_type" name="userType" required>
-              <option value="job_seeker">Job Seeker</option>
-              <option value="recruiter">Recruiter</option>
-              <option value="admin">Admin</option>
-            </select>
-          </div>
-          
-          <div class="form-actions">
-            <button type="button" class="cancel-btn" (click)="cancelAddUser()">Cancel</button>
-            <button type="submit" class="submit-btn">Add User</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-  <!-- Add this at the end of your template (after the add user modal) -->
-<div class="modal" *ngIf="showEditUserModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>Edit User</h2>
-        <button class="close-btn" (click)="cancelEditUser()">&times;</button>
-      </div>
-      <div class="modal-body">
-        <form (ngSubmit)="updateUser()">
-          <div class="form-group">
-            <label for="editFullName">Full Name</label>
-            <input type="text" id="editFullName" [(ngModel)]="currentEditUser.full_name" name="fullName" required>
-          </div>
-          
-          <div class="form-group">
-            <label for="editEmail">Email</label>
-            <input type="email" id="editEmail" [(ngModel)]="currentEditUser.email" name="email" required>
-          </div>
-          
-          <div class="form-group">
-            <label for="editUserType">User Type</label>
-            <select id="editUserType" [(ngModel)]="currentEditUser.user_type" name="userType" required>
-              <option value="job_seeker">Job Seeker</option>
-              <option value="recruiter">Recruiter</option>
-              <option value="admin">Admin</option>
-            </select>
-          </div>
-          
-          <div class="form-actions">
-            <button type="button" class="delete-btn" (click)="deleteUser()">Delete User</button>
-            <div class="right-actions">
-              <button type="button" class="cancel-btn" (click)="cancelEditUser()">Cancel</button>
-              <button type="submit" class="submit-btn">Update User</button>
+    <div class="modal" *ngIf="showAddUserModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New User</h2>
+                <button class="close-btn" (click)="cancelAddUser()">&times;</button>
             </div>
-          </div>
-        </form>
-      </div>
+            <div class="modal-body">
+                <form (ngSubmit)="submitNewUser()">
+                    <div class="form-group">
+                        <label for="fullName">Full Name</label>
+                        <input type="text" id="fullName" [(ngModel)]="newUser.full_name" name="fullName" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" [(ngModel)]="newUser.email" name="email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" [(ngModel)]="newUser.password" name="password" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="userType">User Type</label>
+                        <select id="userType" [(ngModel)]="newUser.user_type" name="userType" required>
+                            <option value="job_seeker">Job Seeker</option>
+                            <option value="recruiter">Recruiter</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="cancel-btn" (click)="cancelAddUser()">Cancel</button>
+                        <button type="submit" class="submit-btn">Add User</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
-  </div>
+    <!-- Add this at the end of your template (after the add user modal) -->
+    <div class="modal" *ngIf="showEditUserModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit User</h2>
+                <button class="close-btn" (click)="cancelEditUser()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form (ngSubmit)="updateUser()">
+                    <div class="form-group">
+                        <label for="editFullName">Full Name</label>
+                        <input type="text" id="editFullName" [(ngModel)]="currentEditUser.full_name" name="fullName"
+                            required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editEmail">Email</label>
+                        <input type="email" id="editEmail" [(ngModel)]="currentEditUser.email" name="email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editUserType">User Type</label>
+                        <select id="editUserType" [(ngModel)]="currentEditUser.user_type" name="userType" required>
+                            <option value="job_seeker">Job Seeker</option>
+                            <option value="recruiter">Recruiter</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="delete-btn" (click)="deleteUser()">Delete User</button>
+                        <div class="right-actions">
+                            <button type="button" class="cancel-btn" (click)="cancelEditUser()">Cancel</button>
+                            <button type="submit" class="submit-btn">Update User</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>

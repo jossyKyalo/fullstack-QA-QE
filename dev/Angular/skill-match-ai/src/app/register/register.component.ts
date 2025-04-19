@@ -66,7 +66,7 @@ export class RegisterComponent {
               this.router.navigate(['/onboarding']);
             } else if(this.userType==='admin'){
               //admins to admin dashboard
-              this.router.navigate(['/users']);
+              this.router.navigate(['/login']);
             }else{
               this.router.navigate(['/login']);
             }
