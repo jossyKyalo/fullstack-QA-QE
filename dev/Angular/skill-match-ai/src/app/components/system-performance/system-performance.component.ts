@@ -1,7 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
+import { SystemPerformanceService, SystemMetrics, ServerMetrics } from '../../services/system-performance.service';
+import { Subscription, interval } from 'rxjs';
 
 interface PerformanceMetric {
   name: string;
@@ -10,12 +12,6 @@ interface PerformanceMetric {
   change?: string;
 }
 
-interface ServerStatus {
-  name: string;
-  status: 'online' | 'offline' | 'degraded';
-  uptime: string;
-  load: number;
-}
 interface NavItem {
   name: string;
   icon: string;
@@ -24,12 +20,16 @@ interface NavItem {
 
 @Component({
   selector: 'app-system-performance',
+  standalone: true,
   imports: [CommonModule],
   templateUrl: './system-performance.component.html',
   styleUrls: ['./system-performance.component.css']
 })
-export class SystemPerformanceComponent implements OnInit {
+export class SystemPerformanceComponent implements OnInit, OnDestroy {
   currentRoute: string = '';
+  private metricsSubscription?: Subscription;
+  isLoading = true;
+  error: string | null = null;
   
   navItems: NavItem[] = [
     { name: 'Dashboard', icon: 'fa-tachometer-alt', route: '/users' },
@@ -39,39 +39,129 @@ export class SystemPerformanceComponent implements OnInit {
     { name: 'System Performance', icon: 'fa-chart-line', route: '/systemPerformance' }
   ];
 
-  constructor(private router: Router) {
-    // Keep track of the current route to highlight the active nav item
+  performanceMetrics: PerformanceMetric[] = [];
+  cpuHistory: number[] = [];
+  memoryHistory: number[] = [];
+  serverStatuses: {
+    name: string;
+    status: 'online' | 'offline' | 'degraded';
+    uptime: string;
+    load: number;
+  }[] = [];
+
+  constructor(
+    private router: Router,
+    private systemService: SystemPerformanceService
+  ) {
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
-    ).subscribe((event: NavigationEnd) => {
+    ).subscribe((event: any) => {
       this.currentRoute = event.url;
     });
     
-    // Set initial route
     this.currentRoute = this.router.url;
+  }
+
+  ngOnInit(): void {
+    this.loadInitialData();
+    this.setupMetricsPolling();
+  }
+
+  ngOnDestroy(): void {
+    if (this.metricsSubscription) {
+      this.metricsSubscription.unsubscribe();
+    }
+  }
+
+  private async loadInitialData() {
+    try {
+      this.isLoading = true;
+      
+      // Load historical data
+      const historical = await this.systemService.getHistoricalMetrics().toPromise();
+      this.cpuHistory = historical?.cpu|| [];
+      this.memoryHistory = historical?.memory|| [];
+
+      // Load server statuses
+      const servers = await this.systemService.getServerStatuses().toPromise();
+      this.serverStatuses = (servers??[]).map(server => ({
+        name: server.name,
+        status: server.status,
+        uptime: this.systemService.formatUptime(server.uptime),
+        load: server.load
+      }));
+
+      this.error = null;
+    } catch (err) {
+      this.error = 'Failed to load system performance data';
+      console.error('Error loading data:', err);
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
+  private setupMetricsPolling() {
+    // Poll metrics every 30 seconds
+    this.metricsSubscription = interval(30000).subscribe(() => {
+      this.updateMetrics();
+    });
+    
+    // Initial metrics load
+    this.updateMetrics();
+  }
+
+  private async updateMetrics() {
+    try {
+      const metrics = await this.systemService.getSystemMetrics().toPromise();
+      if (!metrics) {
+        console.warn('Metrics data is undefined');
+        return;
+      }
+      this.performanceMetrics = [
+        {
+          name: 'CPU Usage',
+          value: `${metrics.cpu.usage}%`,
+          status: this.getMetricStatus(metrics.cpu.usage),
+          change: `${metrics.cpu.change > 0 ? '+' : ''}${metrics.cpu.change}%`
+        },
+        {
+          name: 'Memory Usage',
+          value: `${metrics.memory.usage}%`,
+          status: this.getMetricStatus(metrics.memory.usage),
+          change: `${metrics.memory.change > 0 ? '+' : ''}${metrics.memory.change}%`
+        },
+        {
+          name: 'Disk Space',
+          value: `${metrics.disk.usage}%`,
+          status: this.getMetricStatus(metrics.disk.usage),
+          change: `${metrics.disk.change > 0 ? '+' : ''}${metrics.disk.change}%`
+        },
+        {
+          name: 'Response Time',
+          value: `${metrics.responseTime.value}ms`,
+          status: this.getResponseTimeStatus(metrics.responseTime.value),
+          change: `${metrics.responseTime.change > 0 ? '+' : ''}${metrics.responseTime.change}ms`
+        }
+      ];
+    } catch (err) {
+      console.error('Error updating metrics:', err);
+    }
+  }
+
+  private getMetricStatus(value: number): 'good' | 'warning' | 'critical' {
+    if (value < 70) return 'good';
+    if (value < 90) return 'warning';
+    return 'critical';
+  }
+
+  private getResponseTimeStatus(value: number): 'good' | 'warning' | 'critical' {
+    if (value < 300) return 'good';
+    if (value < 500) return 'warning';
+    return 'critical';
   }
 
   navigate(route: string) {
     this.router.navigate([route]);
-  }
-  performanceMetrics: PerformanceMetric[] = [
-    { name: 'CPU Usage', value: '42%', status: 'good', change: '-3%' },
-    { name: 'Memory Usage', value: '68%', status: 'warning', change: '+5%' },
-    { name: 'Disk Space', value: '37%', status: 'good', change: '+2%' },
-    { name: 'Response Time', value: '235ms', status: 'good', change: '-12ms' }
-  ];
-
-  cpuHistory: number[] = [35, 42, 38, 45, 40, 48, 42];
-  memoryHistory: number[] = [60, 58, 62, 65, 63, 70, 68];
-  
-  serverStatuses: ServerStatus[] = [
-    { name: 'Application Server', status: 'online', uptime: '12d 7h 32m', load: 68 },
-    { name: 'Database Server', status: 'online', uptime: '23d 14h 12m', load: 45 },
-    { name: 'Job Queue Server', status: 'degraded', uptime: '3d 22h 45m', load: 92 },
-    { name: 'Analytics Server', status: 'online', uptime: '16d 3h 51m', load: 30 }
-  ];
-
-  ngOnInit(): void {
   }
 
   getStatusColor(status: 'online' | 'offline' | 'degraded'): string {
@@ -91,6 +181,7 @@ export class SystemPerformanceComponent implements OnInit {
       default: return '#999';
     }
   }
+
   get cpuPolylinePoints(): string {
     return this.cpuHistory
       .map((val, i) => `${i * (700 / (this.cpuHistory.length - 1))},${200 - val * 2}`)
@@ -102,5 +193,4 @@ export class SystemPerformanceComponent implements OnInit {
       .map((val, i) => `${i * (700 / (this.memoryHistory.length - 1))},${200 - val * 2}`)
       .join(' ');
   }
-  
 }
