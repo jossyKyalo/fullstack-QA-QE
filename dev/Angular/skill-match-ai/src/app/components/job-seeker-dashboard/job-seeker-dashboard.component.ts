@@ -12,12 +12,12 @@ import {
   Application,
   ResumeAnalysis,
   EmploymentPreference
-} from '../services/job-seeker-db.service';
+} from '../../services/job-seeker-db.service';
 
 import { 
   AiDatabaseService,
   SkillGapAnalysis
-} from '../services/ai-database.service';
+} from '../../services/ai-database.service';
 
 @Component({
   selector: 'app-job-seeker-dashboard',
