@@ -3,9 +3,8 @@ import pool from "../config/db.config";
 import asyncHandler from "../middlewares/asyncHandler";
 import bcrypt from "bcryptjs";
 import { UserRequest } from "../utils/types/userTypes";
- 
+import * as cron from 'node-cron';
 
-// Get metrics for dashboard (Admin only)
 export const getMetrics = asyncHandler(async (req: Request, res: Response) => {
     const [totalUsers, jobSeekers, recruiters] = await Promise.all([
         pool.query('SELECT COUNT(*) FROM users'),
@@ -13,32 +12,123 @@ export const getMetrics = asyncHandler(async (req: Request, res: Response) => {
         pool.query("SELECT COUNT(*) FROM users WHERE user_type = 'recruiter'")
     ]);
 
-    // Get growth metrics from systemmetrics table
-    const growthMetrics = await pool.query(`
-        SELECT metric_name, value 
-        FROM systemmetrics 
-        WHERE metric_name IN ('total_users_growth', 'job_seekers_growth', 'recruiters_growth')
-        AND recorded_at >= NOW() - INTERVAL '1 month'
-        ORDER BY recorded_at DESC
-        LIMIT 3
-    `);
+    const totalCount = parseInt(totalUsers.rows[0].count);
+    const jobSeekersCount = parseInt(jobSeekers.rows[0].count);
+    const recruitersCount = parseInt(recruiters.rows[0].count);
+    const growthMetricsQuery = `
+      SELECT DISTINCT ON (metric_name) metric_name, value
+      FROM systemmetrics 
+      WHERE metric_name IN ('total_users_growth', 'job_seekers_growth', 'recruiters_growth')
+      AND recorded_at >= NOW() - INTERVAL '1 month'
+      ORDER BY metric_name, recorded_at DESC
+    `;
+
+    const result = await pool.query(growthMetricsQuery);
+    const growthMetrics: Record<string, number> = {};
+    result.rows.forEach(row => {
+        growthMetrics[row.metric_name] = parseFloat(row.value);
+    });
 
     const metrics = {
         totalUsers: {
-            count: parseInt(totalUsers.rows[0].count),
-            growth: growthMetrics.rows.find(m => m.metric_name === 'total_users_growth')?.value || 0
+            count: totalCount,
+            growth: growthMetrics['total_users_growth'] || 0
         },
         jobSeekers: {
-            count: parseInt(jobSeekers.rows[0].count),
-            growth: growthMetrics.rows.find(m => m.metric_name === 'job_seekers_growth')?.value || 0
+            count: jobSeekersCount,
+            growth: growthMetrics['job_seekers_growth'] || 0
         },
         recruiters: {
-            count: parseInt(recruiters.rows[0].count),
-            growth: growthMetrics.rows.find(m => m.metric_name === 'recruiters_growth')?.value || 0
+            count: recruitersCount,
+            growth: growthMetrics['recruiters_growth'] || 0
         }
     };
 
-    res.status(200).json(metrics);
+    res.json(metrics);
+});
+
+
+export const updateGrowthMetrics = async () => {
+    try {
+        // Current counts
+        const [totalUsers, jobSeekers, recruiters] = await Promise.all([
+            pool.query('SELECT COUNT(*) FROM users'),
+            pool.query("SELECT COUNT(*) FROM users WHERE user_type = 'job_seeker'"),
+            pool.query("SELECT COUNT(*) FROM users WHERE user_type = 'recruiter'")
+        ]);
+
+        const totalCount = parseInt(totalUsers.rows[0].count);
+        const jobSeekersCount = parseInt(jobSeekers.rows[0].count);
+        const recruitersCount = parseInt(recruiters.rows[0].count);
+
+        // Historical counts
+        const [prevTotalUsers, prevJobSeekers, prevRecruiters] = await Promise.all([
+            pool.query(`SELECT value FROM historicalmetrics WHERE metric_name = 'total_users' ORDER BY recorded_at DESC LIMIT 1`),
+            pool.query(`SELECT value FROM historicalmetrics WHERE metric_name = 'job_seekers' ORDER BY recorded_at DESC LIMIT 1`),
+            pool.query(`SELECT value FROM historicalmetrics WHERE metric_name = 'recruiters' ORDER BY recorded_at DESC LIMIT 1`)
+        ]);
+
+        const calculateGrowth = (current: number, previous?: number): number => {
+            if (!previous || previous === 0) return 0;
+            return ((current - previous) / previous) * 100;
+        };
+
+        const totalGrowth = calculateGrowth(totalCount, prevTotalUsers.rows[0]?.value);
+        const jobSeekersGrowth = calculateGrowth(jobSeekersCount, prevJobSeekers.rows[0]?.value);
+        const recruitersGrowth = calculateGrowth(recruitersCount, prevRecruiters.rows[0]?.value);
+
+        // Update growth metrics
+        await Promise.all([
+            pool.query('INSERT INTO systemmetrics (metric_name, value, recorded_at) VALUES ($1, $2, NOW())',
+                ['total_users_growth', totalGrowth]),
+            pool.query('INSERT INTO systemmetrics (metric_name, value, recorded_at) VALUES ($1, $2, NOW())',
+                ['job_seekers_growth', jobSeekersGrowth]),
+            pool.query('INSERT INTO systemmetrics (metric_name, value, recorded_at) VALUES ($1, $2, NOW())',
+                ['recruiters_growth', recruitersGrowth])
+        ]);
+
+        // Update historical counts
+        await Promise.all([
+            pool.query('INSERT INTO historicalmetrics (metric_name, value, recorded_at) VALUES ($1, $2, NOW())',
+                ['total_users', totalCount]),
+            pool.query('INSERT INTO historicalmetrics (metric_name, value, recorded_at) VALUES ($1, $2, NOW())',
+                ['job_seekers', jobSeekersCount]),
+            pool.query('INSERT INTO historicalmetrics (metric_name, value, recorded_at) VALUES ($1, $2, NOW())',
+                ['recruiters', recruitersCount])
+        ]);
+
+        console.log('✅ Growth metrics updated:', {
+            totalGrowth, jobSeekersGrowth, recruitersGrowth
+        });
+
+        return {
+            totalGrowth,
+            jobSeekersGrowth,
+            recruitersGrowth
+        };
+    } catch (error) {
+        console.error('❌ Error updating growth metrics:', error);
+        throw error;
+    }
+};
+
+
+export const initializeMetrics = async () => {
+    const result = await pool.query('SELECT COUNT(*) FROM historicalmetrics');
+    if (parseInt(result.rows[0].count) === 0) {
+        console.log('📊 Initializing metrics...');
+        await updateGrowthMetrics();
+    }
+};
+
+
+cron.schedule('0 0 * * *', async () => {
+    console.log('⏰ Scheduled growth metrics update');
+    try {
+        await updateGrowthMetrics();
+    } catch (error) {
+        console.error('❌ Scheduled update error:', error);
+    }
 });
 
 // Get all users with pagination and filtering (Admin only)
@@ -226,12 +316,12 @@ export const searchUsers = asyncHandler(async (req: Request, res: Response) => {
     const query = req.query.q as string;
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
-  
+
     if (!query) {
-      res.status(400);
-      throw new Error('Search query parameter "q" is required');
+        res.status(400);
+        throw new Error('Search query parameter "q" is required');
     }
-  
+
     const [usersResult, countResult] = await Promise.all([
         pool.query(`
           SELECT 
@@ -248,15 +338,15 @@ export const searchUsers = asyncHandler(async (req: Request, res: Response) => {
           WHERE u.full_name ILIKE $1 OR u.email ILIKE $1
           LIMIT $2 OFFSET $3
         `, [`%${query}%`, limit, (page - 1) * limit]),
-        
+
         pool.query(`
           SELECT COUNT(*) 
           FROM users 
           WHERE full_name ILIKE $1 OR email ILIKE $1
         `, [`%${query}%`])
-      ]);
-      
-      const transformedUsers = usersResult.rows.map(user => ({
+    ]);
+
+    const transformedUsers = usersResult.rows.map(user => ({
         id: user.user_id,
         name: user.full_name,
         email: user.email,
@@ -264,13 +354,12 @@ export const searchUsers = asyncHandler(async (req: Request, res: Response) => {
         status: user.status,
         initials: user.full_name.split(' ').map((n: any) => n[0]).join('').toUpperCase(),
         color: `hsl(${Math.random() * 360}, 70%, 80%)`
-      }));
-      
-      res.status(200).json({
+    }));
+
+    res.status(200).json({
         users: transformedUsers,
         totalPages: Math.ceil(parseInt(countResult.rows[0].count) / limit),
         currentPage: page,
         total: parseInt(countResult.rows[0].count)
-      });
-  });
-  
+    });
+});
