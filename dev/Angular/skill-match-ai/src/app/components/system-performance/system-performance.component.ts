@@ -72,6 +72,73 @@ export class SystemPerformanceComponent implements OnInit, OnDestroy {
       this.metricsSubscription.unsubscribe();
     }
   }
+  refreshData(): void {
+    this.isLoading = true;
+    
+    // Reload all the data
+    Promise.all([
+      this.systemService.getSystemMetrics().toPromise(),
+      this.systemService.getHistoricalMetrics().toPromise(),
+      this.systemService.getServerStatuses().toPromise()
+    ]).then(([metrics, historical, servers]) => {
+      // Update metrics
+      if (metrics) {
+        this.updateMetricsDisplay(metrics);
+      }
+      
+      // Update historical data
+      if (historical) {
+        this.cpuHistory = historical.cpu || [];
+        this.memoryHistory = historical.memory || [];
+      }
+      
+      // Update server statuses
+      if (servers) {
+        this.serverStatuses = (servers || []).map(server => ({
+          name: server.name,
+          status: server.status,
+          uptime: this.systemService.formatUptime(server.uptime),
+          load: server.load
+        }));
+      }
+      
+      this.error = null;
+      this.isLoading = false;
+    }).catch(error => {
+      console.error('Error refreshing data:', error);
+      this.error = 'Failed to refresh data';
+      this.isLoading = false;
+    });
+  }
+
+  private updateMetricsDisplay(metrics: any): void {
+    this.performanceMetrics = [
+      {
+        name: 'CPU Usage',
+        value: `${metrics.cpu.usage}%`,
+        status: this.getMetricStatus(metrics.cpu.usage),
+        change: `${metrics.cpu.change > 0 ? '+' : ''}${metrics.cpu.change}%`
+      },
+      {
+        name: 'Memory Usage',
+        value: `${metrics.memory.usage}%`,
+        status: this.getMetricStatus(metrics.memory.usage),
+        change: `${metrics.memory.change > 0 ? '+' : ''}${metrics.memory.change}%`
+      },
+      {
+        name: 'Disk Space',
+        value: `${metrics.disk.usage}%`,
+        status: this.getMetricStatus(metrics.disk.usage),
+        change: `${metrics.disk.change > 0 ? '+' : ''}${metrics.disk.change}%`
+      },
+      {
+        name: 'Response Time',
+        value: `${metrics.responseTime.value}ms`,
+        status: this.getResponseTimeStatus(metrics.responseTime.value),
+        change: `${metrics.responseTime.change > 0 ? '+' : ''}${metrics.responseTime.change}ms`
+      }
+    ];
+  }
 
   private async loadInitialData() {
     try {
@@ -84,6 +151,7 @@ export class SystemPerformanceComponent implements OnInit, OnDestroy {
 
       // Load server statuses
       const servers = await this.systemService.getServerStatuses().toPromise();
+      console.log('Server statuses:', servers);
       this.serverStatuses = (servers??[]).map(server => ({
         name: server.name,
         status: server.status,
@@ -183,14 +251,31 @@ export class SystemPerformanceComponent implements OnInit, OnDestroy {
   }
 
   get cpuPolylinePoints(): string {
+
+    if (!this.cpuHistory || this.cpuHistory.length < 2) {
+      return '';
+    }
+    
     return this.cpuHistory
-      .map((val, i) => `${i * (700 / (this.cpuHistory.length - 1))},${200 - val * 2}`)
+      .map((val, i) => {
+        const x = i * (700 / Math.max(1, this.cpuHistory.length - 1));
+        const y = 200 - (isNaN(val) ? 0 : val) * 2;
+        return `${x},${y}`;
+      })
       .join(' ');
   }
   
   get memoryPolylinePoints(): string {
+    if (!this.memoryHistory || this.memoryHistory.length < 2) {
+      return '';
+    }
+    
     return this.memoryHistory
-      .map((val, i) => `${i * (700 / (this.memoryHistory.length - 1))},${200 - val * 2}`)
+      .map((val, i) => {
+        const x = i * (700 / Math.max(1, this.memoryHistory.length - 1));
+        const y = 200 - (isNaN(val) ? 0 : val) * 2;
+        return `${x},${y}`;
+      })
       .join(' ');
   }
 }

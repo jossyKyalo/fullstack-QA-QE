@@ -40,7 +40,7 @@
       <div class="content-area">
         <div class="performance-header">
           <h1>System Performance</h1>
-          <button class="refresh-btn">
+          <button class="refresh-btn" (click)="refreshData()">
             <i class="fas fa-sync"></i> Refresh Data
           </button>
         </div>
@@ -71,14 +71,16 @@
                 <div class="grid-line" *ngFor="let i of [0,1,2,3,4]"></div>
               </div>
               <div class="chart-data">
-                <svg class="chart-svg" viewBox="0 0 700 200" preserveAspectRatio="none">
+                <div *ngIf="isLoading" class="loading-indicator">Loading...</div>
+                <svg *ngIf="!isLoading" class="chart-svg" viewBox="0 0 700 200" preserveAspectRatio="none">
                     <polyline
+                    *ngIf="cpuPolylinePoints"
                     [attr.points]="cpuPolylinePoints"
                     fill="none"
                     stroke="#2196f3"
                     stroke-width="3"
                   />
-                  
+                  <text *ngIf="!cpuPolylinePoints" x="350" y="100" text-anchor="middle">No data available</text>
                 </svg>
               </div>
             </div>
