@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import authRoutes from "@app/routes/authRoutes";
 import userRoutes from "@app/routes/userRoutes";
+import systemPerformanceRoutes from "@app/routes/systemPerformance.route";
 import pool from "@app/config/db.config";  
 import onboardingRoutes from "./routes/onboarding.routes";
 import bodyParser from "body-parser";
@@ -30,6 +31,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api", onboardingRoutes);
+app.use("/api/system", systemPerformanceRoutes);
 // Dummy skill search
 app.get('/api/skills/search', (req, res) => {
   const term = (req.query.term as string)?.toLowerCase();
