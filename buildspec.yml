@@ -1,0 +1,16 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 18
+    commands:
+      - cd dev/Angular/skill-match-ai
+      - npm install
+  build:
+    commands:
+      -  ng build --configuration production
+artifacts:
+  files:
+    - '**/*'
+  base-directory: dev/Angular/skill-match-ai/dist/skill-match-ai/browser
