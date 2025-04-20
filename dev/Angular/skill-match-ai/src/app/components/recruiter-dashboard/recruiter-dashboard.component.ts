@@ -1,84 +1,109 @@
-// recruiter-dashboard.component.ts
-import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+
+interface Metric {
+  title: string;
+  value: string;
+  trend: string;
+  isPositive: boolean;
+}
+
+interface JobPosting {
+  title: string;
+  department: string;
+  location: string;
+  applicants: number;
+}
+
+interface Candidate {
+  name: string;
+  position: string;
+  location: string;
+}
 
 @Component({
   selector: 'app-recruiter-dashboard',
-  imports: [CommonModule],
+  standalone: true,
+  imports: [CommonModule, FormsModule],
   templateUrl: './recruiter-dashboard.component.html',
   styleUrls: ['./recruiter-dashboard.component.css']
 })
 export class RecruiterDashboardComponent {
-  recruiterName: string = 'Kyalo';
-  
-  metrics = {
-    applicationRate: {
-      value: '15.8%',
-      change: '+3.5%',
-      trend: 'positive'
+  recruiterName = 'Kyalo';
+  searchQuery = '';
+
+  metrics: Metric[] = [
+    { 
+      title: 'Application rate', 
+      value: '12.8%', 
+      trend: '+3.5%', 
+      isPositive: true 
     },
-    candidateQuality: {
-      value: '8.6/10',
-      change: '+0.4%',
-      trend: 'positive'
+    { 
+      title: 'Candidate Quality', 
+      value: '8.6/10', 
+      trend: '+0.4%', 
+      isPositive: true 
     },
-    avgTimeToHire: {
-      value: '18 days',
-      change: '-10 days',
-      trend: 'positive' 
-    }
-  };
-  
-  activeJobPostings = [
-    {
-      title: 'Senior Frontend Developer',
-      department: 'Engineering',
-      location: 'Nairobi',
-      applicants: 24
-    },
-    {
-      title: 'UI/UX Designer',
-      department: 'Design',
-      location: 'Remote',
-      applicants: 16
+    { 
+      title: 'Avg. Time to Hire', 
+      value: '18 days', 
+      trend: '-10 days', 
+      isPositive: true 
     }
   ];
-  
-  candidateMatches = [
-    {
-      name: 'Blaise Kyalo',
-      position: 'Frontend Developer',
-      location: 'Nairobi'
+
+  activeJobs: JobPosting[] = [
+    { 
+      title: 'Senior Frontend Developer', 
+      department: 'Engineering', 
+      location: 'Nairobi', 
+      applicants: 24 
     },
-    {
-      name: 'Marya Chabet',
-      position: 'UI/UX Designer',
-      location: 'Remote'
-    },
-    {
-      name: 'Sabrina Munakyhe',
-      position: 'Product Manager',
-      location: 'Nairobi'
+    { 
+      title: 'UI/UX Designer', 
+      department: 'Design', 
+      location: 'Remote', 
+      applicants: 18 
     }
   ];
-  
-  searchCandidates(event: any) {
-    console.log('Searching for:', event.target.value);
-    // Search implementation  
+
+  candidateMatches: Candidate[] = [
+    { 
+      name: 'Blaise Kyalo', 
+      position: 'Frontend Developer', 
+      location: 'Nairobi' 
+    },
+    { 
+      name: 'Marisa Cheloti', 
+      position: 'UI/UX Designer', 
+      location: 'Remote' 
+    },
+    { 
+      name: 'Sabrina Mutethya', 
+      position: 'Product Manager', 
+      location: 'Nairobi' 
+    }
+  ];
+
+  search(): void {
+    console.log('Searching for:', this.searchQuery);
+    //search functionality
   }
-  
-  startAIAssistant() {
-    console.log('Starting AI assistant');
-    // AI assistant logic  
+
+  activateAIAssistant(): void {
+    console.log('AI Assistant activated');
+    // AI assistant functionality
   }
-  
-  postNewJob() {
-    console.log('Posting new job');
-    // Job posting logic  
+
+  postNewJob(): void {
+    console.log('Post new job clicked');
+    //post new job functionality
   }
-  
-  contactCandidate(candidate: any) {
-    console.log('Contacting candidate:', candidate.name);
-    // Contact logic  
+
+  contactCandidate(candidate: Candidate): void {
+    console.log('Contact candidate:', candidate.name);
+    //contact candidate functionality
   }
 }
