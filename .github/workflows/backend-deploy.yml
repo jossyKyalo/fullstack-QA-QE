@@ -18,14 +18,17 @@ jobs:
           ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
       
       - name: Test SSH Connection
-        run: ssh -v -i ~/.ssh/y ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} echo "Connection test"
+        run:  ssh -o ServerAliveInterval=60 -o ServerAliveCountMax=3 -v -i ~/.ssh/y ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} echo "Connection test"
         
       - name: Deploy to EC2
         env:
           DEBUG: true
         run: |
-          ssh -i ~/.ssh/y ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-          cd fullstack-QA-QE/dev/Angular/skillMatchBackend   
-          git pull origin master
-          docker compose up 
+          ssh -o ServerAliveInterval=60 -o ServerAliveCountMax=3 -i ~/.ssh/y ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+          cd /path/to/your/project/fullstack-QA-QE/dev/Angular/skillMatchBackend
+          docker --version
+          docker-compose --version
+          git pull origin main 
+          docker-compose down
+          docker-compose up --build -d
           EOF
