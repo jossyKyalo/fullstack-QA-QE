@@ -9,12 +9,14 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+      
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/y
           chmod 600 ~/.ssh/y
           ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+      
       - name: Deploy to EC2
         env:
           DEBUG: "true"
@@ -23,4 +25,4 @@ jobs:
             cd fullstack-QA-QE/dev/Angular/skillMatchBackend   
             git pull origin main
             docker compose up 
-          EOF'
+          EOF
