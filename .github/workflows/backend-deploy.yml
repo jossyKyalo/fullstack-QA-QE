@@ -27,8 +27,8 @@ jobs:
           ssh -o ServerAliveInterval=60 -o ServerAliveCountMax=3 -i ~/.ssh/y ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
           cd /path/to/your/project/fullstack-QA-QE/dev/Angular/skillMatchBackend
           docker --version
-          docker-compose --version
+          docker compose --version
           git pull origin main 
-          docker-compose down
-          docker-compose up --build -d
+          docker compose down
+          docker compose up --build -d
           EOF
