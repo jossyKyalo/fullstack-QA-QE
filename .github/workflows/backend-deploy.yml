@@ -1,30 +1,26 @@
 name: Deploy to EC2 on Push
-
 on:
   push:
     branches:
       - master
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/y
           chmod 600 ~/.ssh/y
           ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
-
       - name: Deploy to EC2
+        env:
+          DEBUG: "true"
         run: |
           ssh -i ~/.ssh/y ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
             cd fullstack-QA-QE/dev/Angular/skillMatchBackend   
             git pull origin main
             docker compose up 
-          EOF
-          DEBUG: "true"
+          EOF'
