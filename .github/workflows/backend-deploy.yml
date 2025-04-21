@@ -17,12 +17,15 @@ jobs:
           chmod 600 ~/.ssh/y
           ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
       
+      - name: Test SSH Connection
+        run: ssh -v -i ~/.ssh/y ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} echo "Connection test"
+        
       - name: Deploy to EC2
         env:
-          DEBUG: "true"
+          DEBUG: true
         run: |
           ssh -i ~/.ssh/y ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-            cd fullstack-QA-QE/dev/Angular/skillMatchBackend   
-            git pull origin main
-            docker compose up 
+          cd fullstack-QA-QE/dev/Angular/skillMatchBackend   
+          git pull origin main
+          docker compose up 
           EOF
