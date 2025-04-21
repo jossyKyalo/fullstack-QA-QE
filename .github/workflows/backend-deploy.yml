@@ -27,3 +27,4 @@ jobs:
             git pull origin main
             docker compose up 
           EOF
+          DEBUG: "true"
