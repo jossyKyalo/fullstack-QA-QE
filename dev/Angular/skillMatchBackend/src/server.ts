@@ -10,7 +10,7 @@ import systemPerformanceRoutes from "@app/routes/systemPerformance.route";
 import pool from "@app/config/db.config";  
 import onboardingRoutes from "./routes/onboarding.routes";
 import bodyParser from "body-parser";
-
+import recruiterRoutes from './routes/recruiterRoutes';
 
 dotenv.config();
 
@@ -32,6 +32,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api", onboardingRoutes);
 app.use("/api/system", systemPerformanceRoutes);
+app.use('/api/recruiters', recruiterRoutes);
+
 // Dummy skill search
 app.get('/api/skills/search', (req, res) => {
   const term = (req.query.term as string)?.toLowerCase();
