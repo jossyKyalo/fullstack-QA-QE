@@ -75,4 +75,225 @@
       </div>
     </div>
   </div>
+  
+<div class="modal-overlay" *ngIf="showAiAssistantModal">
+  <div class="modal-container">
+    <div class="modal-header">
+      <h3>AI Recruitment Assistant</h3>
+      <button class="close-btn" (click)="closeAiAssistant()">×</button>
+    </div>
+    
+    <div class="modal-tabs">
+      <button [class.active]="aiAssistantMode === 'candidateSuggestion'" 
+              (click)="changeAiMode('candidateSuggestion')">
+        Find Candidates
+      </button>
+      <button [class.active]="aiAssistantMode === 'jobDescription'" 
+              (click)="changeAiMode('jobDescription')">
+        Generate Job Description
+      </button>
+    </div>
+    
+    <!-- Find Candidates Tab -->
+    <div class="modal-content" *ngIf="aiAssistantMode === 'candidateSuggestion'">
+      <div class="job-selector">
+        <label>Select a job to find matching candidates:</label>
+        <select [(ngModel)]="selectedJob" (change)="loadAICandidateSuggestions()">
+          <option *ngFor="let job of activeJobs" [ngValue]="job">
+            {{job.title}}
+          </option>
+        </select>
+      </div>
+      
+      <div class="ai-loader" *ngIf="aiAssistantLoading">
+        <div class="loader-spinner"></div>
+        <p>AI is analyzing candidate profiles...</p>
+      </div>
+      
+      <div class="ai-results" *ngIf="!aiAssistantLoading && aiAssistantResults.length > 0">
+        <div class="ai-result-card" *ngFor="let candidate of aiAssistantResults">
+          <div class="ai-result-header">
+            <div class="candidate-avatar">{{candidate.name.charAt(0)}}</div>
+            <div class="candidate-info">
+              <div class="candidate-name">{{candidate.name}}</div>
+              <div class="candidate-position">{{candidate.position}} - {{candidate.location}}</div>
+            </div>
+            <div class="match-score">{{candidate.matchScore}}% Match</div>
+          </div>
+          
+          <div class="candidate-skills">
+            <span class="skill-tag" *ngFor="let skill of candidate.skills">{{skill}}</span>
+          </div>
+          
+          <div class="match-reason">
+            <p><strong>AI Explanation:</strong> {{candidate.reasonForMatch}}</p>
+          </div>
+          
+          <div class="ai-result-actions">
+            <button class="button secondary" (click)="contactCandidate(candidate)">Contact</button>
+            <button class="button text">View Profile</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="empty-state" *ngIf="!aiAssistantLoading && activeJobs.length === 0">
+        <p>You don't have any active jobs to match candidates with.</p>
+        <button class="button primary" (click)="closeAiAssistant(); postNewJob()">Create a Job First</button>
+      </div>
+      
+      <div class="empty-state" *ngIf="!aiAssistantLoading && activeJobs.length > 0 && aiAssistantResults.length === 0">
+        <p>No matching candidates found for this job.</p>
+        <button class="button primary" (click)="loadAICandidateSuggestions()">Try Again</button>
+      </div>
+    </div>
+    
+     
+    <div class="modal-content" *ngIf="aiAssistantMode === 'jobDescription'">
+      <div class="job-form">
+        <div class="form-group">
+          <label>Job Title*</label>
+          <input type="text" [(ngModel)]="newJob.title" placeholder="e.g. Senior Software Engineer">
+        </div>
+        
+        <div class="form-group">
+          <label>Department</label>
+          <input type="text" [(ngModel)]="newJob.department" placeholder="e.g. Engineering">
+        </div>
+        
+        <div class="form-group">
+          <label>Location</label>
+          <input type="text" [(ngModel)]="newJob.location" placeholder="e.g. New York">
+        </div>
+        
+        <div class="form-group checkbox">
+          <input type="checkbox" id="remoteOption" [(ngModel)]="newJob.remoteOption">
+          <label for="remoteOption">Remote Option Available</label>
+        </div>
+        
+        <div class="form-group">
+          <label>Employment Type</label>
+          <select [(ngModel)]="newJob.employmentType">
+            <option value="full-time">Full-time</option>
+            <option value="part-time">Part-time</option>
+            <option value="contract">Contract</option>
+            <option value="internship">Internship</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>Required Skills*</label>
+          <div class="skills-input">
+            <input type="text" [(ngModel)]="skillSearch" placeholder="Search skills">
+            <div class="skills-dropdown" *ngIf="skillSearch.length > 0">
+              <div class="skill-option" *ngFor="let skill of filteredSkills()" (click)="addSkill(skill)">
+                {{skill.name}}
+              </div>
+            </div>
+          </div>
+          
+          <div class="selected-skills">
+            <span class="skill-tag" *ngFor="let skill of newJob.requiredSkills">
+              {{skill}} <button class="remove-skill" (click)="removeSkill(skill)">×</button>
+            </span>
+          </div>
+        </div>
+        
+        <button class="button primary full-width" (click)="generateJobDescription()" 
+                [disabled]="!newJob.title || newJob.requiredSkills.length === 0">
+          Generate Job Description
+        </button>
+      </div>
+      
+      <div class="ai-loader" *ngIf="aiAssistantLoading">
+        <div class="loader-spinner"></div>
+        <p>AI is generating a job description...</p>
+      </div>
+      
+      <div class="description-result" *ngIf="newJob.description">
+        <h4>Generated Job Description:</h4>
+        <textarea rows="10" [(ngModel)]="newJob.description"></textarea>
+        <div class="description-actions">
+          <button class="button primary" (click)="submitNewJob()">Use This Description & Post Job</button>
+          <button class="button secondary" (click)="generateJobDescription()">Regenerate</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- New Job Modal -->
+<div class="modal-overlay" *ngIf="showJobModal">
+  <div class="modal-container">
+    <div class="modal-header">
+      <h3>Post New Job</h3>
+      <button class="close-btn" (click)="closeJobModal()">×</button>
+    </div>
+    
+    <div class="modal-content">
+      <div class="job-form">
+        <div class="form-group">
+          <label>Job Title*</label>
+          <input type="text" [(ngModel)]="newJob.title" placeholder="e.g. Senior Software Engineer">
+        </div>
+        
+        <div class="form-group">
+          <label>Department</label>
+          <input type="text" [(ngModel)]="newJob.department" placeholder="e.g. Engineering">
+        </div>
+        
+        <div class="form-group">
+          <label>Location</label>
+          <input type="text" [(ngModel)]="newJob.location" placeholder="e.g. New York">
+        </div>
+        
+        <div class="form-group checkbox">
+          <input type="checkbox" id="remoteOptionJob" [(ngModel)]="newJob.remoteOption">
+          <label for="remoteOptionJob">Remote Option Available</label>
+        </div>
+        
+        <div class="form-group">
+          <label>Employment Type</label>
+          <select [(ngModel)]="newJob.employmentType">
+            <option value="full-time">Full-time</option>
+            <option value="part-time">Part-time</option>
+            <option value="contract">Contract</option>
+            <option value="internship">Internship</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>Required Skills*</label>
+          <div class="skills-input">
+            <input type="text" [(ngModel)]="skillSearch" placeholder="Search skills">
+            <div class="skills-dropdown" *ngIf="skillSearch.length > 0">
+              <div class="skill-option" *ngFor="let skill of filteredSkills()" (click)="addSkill(skill)">
+                {{skill.name}}
+              </div>
+            </div>
+          </div>
+          
+          <div class="selected-skills">
+            <span class="skill-tag" *ngFor="let skill of newJob.requiredSkills">
+              {{skill}} <button class="remove-skill" (click)="removeSkill(skill)">×</button>
+            </span>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label>Job Description*</label>
+          <textarea rows="10" [(ngModel)]="newJob.description" placeholder="Enter job description or use AI Assistant to generate one"></textarea>
+        </div>
+        
+        <div class="form-actions">
+          <button class="button secondary" (click)="changeAiMode('jobDescription'); closeJobModal(); showAiAssistantModal = true;">
+            Use AI to Generate Description
+          </button>
+          <button class="button primary" (click)="submitNewJob()" [disabled]="!newJob.title || !newJob.description">
+            Post Job
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 </div>
