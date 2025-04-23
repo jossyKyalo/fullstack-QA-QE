@@ -8,7 +8,7 @@ import { generateTokens } from "../utils/helpers/generateToken";
 
 // Register a new user (Job Seeker, Recruiter, Admin)
 export const registerUser = asyncHandler(async (req: UserRequest, res: Response, next: NextFunction) => {
-    const { email, full_name, password, user_type = 'job_seeker',company_id, position,resume_document, headline, current_company, years_experience, remote_preference, profile_picture} = req.body; 
+    const { email, full_name, password, user_type = 'job_seeker'} = req.body; 
 
     // Check if user exists
     const userExists = await pool.query("SELECT user_id FROM users WHERE email = $1", [email]);
@@ -30,20 +30,14 @@ export const registerUser = asyncHandler(async (req: UserRequest, res: Response,
     const newUserId = newUser.user_id;
     if (user_type === 'recruiter') {
         await pool.query(
-            "INSERT INTO recruiters (user_id, company_id, position) VALUES ($1, $2, $3)",
-            [newUserId, company_id || null, position || null]
+            "INSERT INTO recruiters (user_id) VALUES ($1)",
+            [newUserId]
         );
     } else if (user_type === 'job_seeker') {
         await pool.query(
-            "INSERT INTO jobseekers (user_id, resume_document, headline, current_company, years_experience, remote_preference, profile_picture) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+            "INSERT INTO jobseekers (user_id) VALUES ($1)",
             [
-                newUserId,
-                resume_document || null,
-                headline || null,
-                current_company || null,
-                years_experience || null,
-                remote_preference || null,
-                profile_picture ? Buffer.from(profile_picture, 'base64') : null  
+                newUserId  
             ]
         );
     }
