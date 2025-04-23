@@ -8,7 +8,7 @@ import { generateTokens } from "../utils/helpers/generateToken";
 
 // Register a new user (Job Seeker, Recruiter, Admin)
 export const registerUser = asyncHandler(async (req: UserRequest, res: Response, next: NextFunction) => {
-    const { email, full_name, password, user_type = 'job_seeker' } = req.body; // Default to 'job_seeker' if no role is provided
+    const { email, full_name, password, user_type = 'job_seeker',company_id, position,resume_document, headline, current_company, years_experience, remote_preference, profile_picture} = req.body; 
 
     // Check if user exists
     const userExists = await pool.query("SELECT user_id FROM users WHERE email = $1", [email]);
@@ -22,17 +22,38 @@ export const registerUser = asyncHandler(async (req: UserRequest, res: Response,
     const hashedPassword = await bcrypt.hash(password, salt);
 
     // Insert user into DB
-    const newUser = await pool.query(
+    const newUserResult = await pool.query(
         "INSERT INTO users (email, full_name, password, user_type) VALUES ($1, $2, $3, $4) RETURNING user_id, email, full_name, user_type",
         [email, full_name, hashedPassword, user_type]
     );
+    const newUser = newUserResult.rows[0];
+    const newUserId = newUser.user_id;
+    if (user_type === 'recruiter') {
+        await pool.query(
+            "INSERT INTO recruiters (user_id, company_id, position) VALUES ($1, $2, $3)",
+            [newUserId, company_id || null, position || null]
+        );
+    } else if (user_type === 'job_seeker') {
+        await pool.query(
+            "INSERT INTO jobseekers (user_id, resume_document, headline, current_company, years_experience, remote_preference, profile_picture) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+            [
+                newUserId,
+                resume_document || null,
+                headline || null,
+                current_company || null,
+                years_experience || null,
+                remote_preference || null,
+                profile_picture ? Buffer.from(profile_picture, 'base64') : null  
+            ]
+        );
+    }
 
     // Generate JWT Token
-    generateTokens(res, newUser.rows[0].user_id, newUser.rows[0].user_type);
+    generateTokens(res, newUserId, user_type);
 
     res.status(201).json({
         message: "User registered successfully",
-        user: newUser.rows[0]
+        user: newUser
     });
 
     next();
