@@ -21,7 +21,7 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-    origin: "http://localhost:4200", 
+    origin: ["http://localhost:4200", "http://skill-match-ai.s3-website.eu-north-1.amazonaws.com"], 
     methods: "GET, POST ,PUT, DELETE",
     credentials: true }));
 app.use(bodyParser.json());
