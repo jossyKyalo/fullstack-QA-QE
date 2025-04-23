@@ -13,6 +13,9 @@ export class OnboardingService {
   
 
   saveOnboardingData(data: any): Observable<any> {
+    const headers = {
+      'Authorization': `Bearer ${localStorage.getItem('auth_token')}`  
+    };
     return this.http.post(`${this.apiUrl}/onboarding`, this.prepareFormData(data));
   }
 

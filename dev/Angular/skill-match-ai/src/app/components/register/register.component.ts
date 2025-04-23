@@ -3,7 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import {environment} from '../../../environment';
+import { UserService } from '../../services/user.service'; 
+import { AbstractControlOptions } from '@angular/forms';
 
 @Component({
   selector: 'app-register',
@@ -16,9 +17,10 @@ export class RegisterComponent {
   registerForm: FormGroup;
   userType: string = 'job_seeker';
   errorMessage: string | null = null; // To display registration errors
-  private apiUrl = `${environment.apiUrl}/auth/register`; 
+                         
 
   constructor(
+    private userService: UserService,
     private fb: FormBuilder,
     private router: Router,
     private http: HttpClient
@@ -27,59 +29,40 @@ export class RegisterComponent {
       email: ['', [Validators.required, Validators.email]],
       full_name: ['', Validators.required],
       password: ['', [Validators.required, Validators.minLength(8)]],
-      confirmPassword: ['', Validators.required]
-    }, {
-      validators: this.passwordMatchValidator
+      confirmPassword: ['', Validators.required],
+      user_type: [this.userType]
+    },
+     {
+      validators: this.passwordMatchValidator as AbstractControlOptions['validators']
     });
   }
 
-  passwordMatchValidator(formGroup: FormGroup) {
-    const password = formGroup.get('password')?.value;
-    const confirmPassword = formGroup.get('confirmPassword')?.value;
-
-    if (password !== confirmPassword) {
-      formGroup.get('confirmPassword')?.setErrors({ passwordMismatch: true });
-      return { passwordMismatch: true };
-    } else {
-      formGroup.get('confirmPassword')?.setErrors(null);
-      return null;
-    }
+  passwordMatchValidator(group: FormGroup) {
+    const password = group.controls['password'].value;
+    const confirmPassword = group.controls['confirmPassword'].value;
+    return password === confirmPassword ? null : { notMatching: true };
   }
 
   setUserType(type: string): void {
     this.userType = type;
+    this.registerForm.patchValue({ user_type: type });
   }
 
   onSubmit(): void {
     if (this.registerForm.valid) {
-      const formData = {
-        email: this.registerForm.value.email,
-        full_name: this.registerForm.value.full_name,
-        password: this.registerForm.value.password,
-        user_type: this.userType // e.g., 'job_seeker'
-      };
-
-      this.http.post(`${this.apiUrl}`, formData, { withCredentials: true })
-        .subscribe({
-          next: (res: any) => {
-            console.log('✅ Registration successful:', res);
-            if (this.userType === 'job_seeker') {
-              // Redirect job seekers to onboarding
-              this.router.navigate(['/onboarding']);
-            } else if(this.userType==='admin'){
-              //admins to admin dashboard
-              this.router.navigate(['/login']);
-            }else{
-              this.router.navigate(['/login']);
-            }
-          },
-          error: (err) => {
-            console.error('❌ Registration failed:', err);
-            this.errorMessage = err.error?.message || 'Registration failed. Please try again.';
-          }
-        });
+      const userData = this.registerForm.value;
+      this.userService.createUser(userData).then(
+        (response: any) => {
+          console.log('Registration successful:', response);
+          this.router.navigate(['/login']);
+        })
+        .catch((error) => {
+          console.error('Registration failed:', error);
+          this.errorMessage = error.error.message || 'Registration failed. Please try again.';
+        }
+      );
     } else {
-      this.registerForm.markAllAsTouched();
+      this.errorMessage = 'Please fill out all required fields correctly.';
     }
   }
 
