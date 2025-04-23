@@ -34,7 +34,8 @@ export const authenticateToken = (req: Request, res: Response, next: NextFunctio
       }
       
       const payload = decoded as TokenPayload;
-      
+      console.log("Decoded JWT payload:", payload);
+
       // Add user info to request
       req.userId = payload.id;
       req.userType = payload.user_type;

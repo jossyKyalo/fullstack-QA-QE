@@ -43,6 +43,9 @@ export class UserService {
 
           if (response.access_token) {
             localStorage.setItem('auth_token', response.access_token);
+            console.log('✅ Token stored in localStorage:', response.access_token);
+          }else{
+            console.warn('⚠️ No access_token received in login response.');
           }
         })
       );

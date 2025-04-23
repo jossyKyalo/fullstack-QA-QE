@@ -25,4 +25,9 @@ router.post('/jobs', createJob);
 router.get('/search', searchCandidates);
 router.post('/contact', contactCandidate);
 
+router.post('/test-job', (req, res) => {
+  console.log('Hit the /test-job route!');
+  res.status(200).json({ message: 'Test POST job route works!' });
+ });
+
 export default router;

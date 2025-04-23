@@ -64,7 +64,7 @@ export const loginUser = asyncHandler(async (req: UserRequest, res: Response, ne
     }
 
     // Generate JWT Token
-    generateTokens(res, user.user_id, user.user_type);
+    const { accessToken, refreshToken } = generateTokens(res, user.user_id, user.user_type);
 
     // Update last login timestamp
     await pool.query("UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE user_id = $1", [user.user_id]);
@@ -76,7 +76,8 @@ export const loginUser = asyncHandler(async (req: UserRequest, res: Response, ne
             email: user.email,
             full_name: user.full_name,
             user_type: user.user_type
-        }
+        },
+        access_token: accessToken
     });
 
     next();
