@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import {environment} from '../../../environment';
 
 @Component({
   selector: 'app-register',
@@ -15,6 +16,7 @@ export class RegisterComponent {
   registerForm: FormGroup;
   userType: string = 'job_seeker';
   errorMessage: string | null = null; // To display registration errors
+  private apiUrl = `${environment.apiUrl}/auth/register`; 
 
   constructor(
     private fb: FormBuilder,
@@ -57,7 +59,7 @@ export class RegisterComponent {
         user_type: this.userType // e.g., 'job_seeker'
       };
 
-      this.http.post('http://localhost:4000/api/auth/register', formData, { withCredentials: true })
+      this.http.post(`${this.apiUrl}`, formData, { withCredentials: true })
         .subscribe({
           next: (res: any) => {
             console.log('✅ Registration successful:', res);
