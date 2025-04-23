@@ -1,13 +1,11 @@
-import { setupAliases } from "import-aliases";
-setupAliases()
 import express from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import authRoutes from "@app/routes/authRoutes";
-import userRoutes from "@app/routes/userRoutes";
-import systemPerformanceRoutes from "@app/routes/systemPerformance.route";
-import pool from "@app/config/db.config";  
+import authRoutes from "./routes/authRoutes";
+import userRoutes from "./routes/userRoutes";
+import systemPerformanceRoutes from "./routes/systemPerformance.route";
+import pool from "./config/db.config";  
 import onboardingRoutes from "./routes/onboarding.routes";
 import bodyParser from "body-parser";
 import recruiterRoutes from './routes/recruiterRoutes';
