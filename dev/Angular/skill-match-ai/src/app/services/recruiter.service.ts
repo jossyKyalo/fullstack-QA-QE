@@ -20,11 +20,11 @@ export class RecruiterService {
   }
 
   getActiveJobs(id: number): Observable<any> {
-    return this.http.get(`${this.apiUrl}/${id}/jobs`);
+    return this.http.get(`${this.apiUrl}/${id}/jobs/active`);
   }
 
   getCandidateMatches(id: number): Observable<any> {
-    return this.http.get(`${this.apiUrl}/${id}/matches`);
+    return this.http.get(`${this.apiUrl}/${id}/candidates/matches`);
   }
 
   createJob(jobData: any): Observable<any> {

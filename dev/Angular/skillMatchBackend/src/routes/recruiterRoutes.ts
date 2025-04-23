@@ -1,4 +1,3 @@
-// src/routes/recruiterRoutes.ts
 import express from 'express';
 import { 
   getRecruiterProfile,
