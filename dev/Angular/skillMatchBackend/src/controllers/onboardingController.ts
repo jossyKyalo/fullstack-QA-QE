@@ -1,9 +1,12 @@
 import { Request, Response } from "express";
+import "../utils/types/customRequest";  
 import db from "../config/db.config";
-import { authenticateToken } from "../middlewares/authMiddleware";  
+import { protect } from "../middlewares/auth/protect";  
+import { User } from "../utils/types/userTypes"; 
 
 export const createJobSeekerProfile = async (req: Request, res: Response) => {
-    const userId = (req as any).userId; 
+    const user = req.user as User;  
+    const userId = user?.user_id;  
 
     if (!userId) {
         res.status(401).json({ error: "User not authenticated" });

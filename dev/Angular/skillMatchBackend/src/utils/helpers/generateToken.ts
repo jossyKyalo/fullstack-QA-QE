@@ -3,10 +3,7 @@ import jwt from "jsonwebtoken";
 
 dotenv.config();
 
-console.log("JWT_SECRET:", process.env.JWT_SECRET);
-console.log("REFRESH_TOKEN_SECRET:", process.env.REFRESH_TOKEN_SECRET);
-
-export const generateTokens = (userId: string, role: string) => {
+export const generateTokens = (user: { user_id: number; user_type: string; email: string; full_name: string }) => {
     const jwtSecret = process.env.JWT_SECRET;
     const refreshSecret = process.env.REFRESH_TOKEN_SECRET;
 
@@ -15,16 +12,14 @@ export const generateTokens = (userId: string, role: string) => {
     }
 
     try {
-        // Generate access token (e.g., 15 mins or 7 days for testing)
         const accessToken = jwt.sign(
-            { user_id: userId, user_type: role },
+            { user_id: user.user_id.toString(), user_type: user.user_type, email: user.email, full_name: user.full_name }, // user_id as string
             jwtSecret,
             { expiresIn: "7d" }
         );
 
-        // Generate refresh token (e.g., 30 days)
         const refreshToken = jwt.sign(
-            { user_id: userId },
+            { user_id: user.user_id.toString() }, // user_id as string
             refreshSecret,
             { expiresIn: "30d" }
         );
