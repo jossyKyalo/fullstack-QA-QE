@@ -37,7 +37,7 @@ export class UserService {
   constructor(private http: HttpClient) { }
 
   login(credentials: { email: string; password: string }): Observable<any> {
-    return this.http.post(`${this.authUrl}/login`, credentials, { withCredentials: true })
+    return this.http.post(`${this.authUrl}/login`, credentials)
       .pipe(
         tap((response: any) => {
 

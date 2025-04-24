@@ -19,7 +19,7 @@ const db_config_1 = __importDefault(require("../config/db.config"));
 const generateToken_1 = require("../utils/helpers/generateToken");
 // Register a new user (Job Seeker, Recruiter, Admin)
 exports.registerUser = (0, asyncHandler_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { email, full_name, password, user_type = 'job_seeker' } = req.body; // Default to 'job_seeker' if no role is provided
+    const { email, full_name, password, user_type = 'job_seeker' } = req.body;
     // Check if user exists
     const userExists = yield db_config_1.default.query("SELECT user_id FROM users WHERE email = $1", [email]);
     if (userExists.rows.length > 0) {
@@ -30,12 +30,22 @@ exports.registerUser = (0, asyncHandler_1.default)((req, res, next) => __awaiter
     const salt = yield bcryptjs_1.default.genSalt(10);
     const hashedPassword = yield bcryptjs_1.default.hash(password, salt);
     // Insert user into DB
-    const newUser = yield db_config_1.default.query("INSERT INTO users (email, full_name, password, user_type) VALUES ($1, $2, $3, $4) RETURNING user_id, email, full_name, user_type", [email, full_name, hashedPassword, user_type]);
+    const newUserResult = yield db_config_1.default.query("INSERT INTO users (email, full_name, password, user_type) VALUES ($1, $2, $3, $4) RETURNING user_id, email, full_name, user_type", [email, full_name, hashedPassword, user_type]);
+    const newUser = newUserResult.rows[0];
+    const newUserId = newUser.user_id;
+    if (user_type === 'recruiter') {
+        yield db_config_1.default.query("INSERT INTO recruiters (user_id) VALUES ($1)", [newUserId]);
+    }
+    else if (user_type === 'job_seeker') {
+        yield db_config_1.default.query("INSERT INTO jobseekers (user_id) VALUES ($1)", [
+            newUserId
+        ]);
+    }
     // Generate JWT Token
-    (0, generateToken_1.generateTokens)(res, newUser.rows[0].user_id, newUser.rows[0].user_type);
+    (0, generateToken_1.generateTokens)(res, newUserId, user_type);
     res.status(201).json({
         message: "User registered successfully",
-        user: newUser.rows[0]
+        user: newUser
     });
     next();
 }));
@@ -56,6 +66,13 @@ exports.loginUser = (0, asyncHandler_1.default)((req, res, next) => __awaiter(vo
         res.status(401).json({ message: "Invalid email or password" });
         return;
     }
+    let onboardingComplete = false;
+    if (user.user_type === 'job_seeker') {
+        const jobSeekerQuery = yield db_config_1.default.query("SELECT onboarding_complete FROM jobseekers WHERE user_id = $1", [user.user_id]);
+        if (jobSeekerQuery.rows.length > 0) {
+            onboardingComplete = jobSeekerQuery.rows[0].onboarding_complete;
+        }
+    }
     // Generate JWT Token
     const { accessToken, refreshToken } = (0, generateToken_1.generateTokens)(res, user.user_id, user.user_type);
     // Update last login timestamp
@@ -68,7 +85,8 @@ exports.loginUser = (0, asyncHandler_1.default)((req, res, next) => __awaiter(vo
             full_name: user.full_name,
             user_type: user.user_type
         },
-        access_token: accessToken
+        access_token: accessToken,
+        onboarding_complete: onboardingComplete
     });
     next();
 }));
