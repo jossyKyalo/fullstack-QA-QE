@@ -43,7 +43,7 @@ export const registerUser = asyncHandler(async (req: UserRequest, res: Response,
     }
 
     // Generate JWT Token
-    generateTokens(res, newUserId, user_type);
+    generateTokens(newUserId, user_type);
 
     res.status(201).json({
         message: "User registered successfully",
@@ -88,22 +88,12 @@ export const loginUser = asyncHandler(async (req: UserRequest, res: Response, ne
         }
     }
     // Generate JWT Token
-    const { accessToken, refreshToken } = generateTokens(res, user.user_id, user.user_type);
+    const { accessToken, refreshToken } = generateTokens(user.user_id, user.user_type);
 
     // Update last login timestamp
     await pool.query("UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE user_id = $1", [user.user_id]);
 
-    res.status(200).json({
-        message: "Login successful",
-        user: {
-            id: user.user_id,
-            email: user.email,
-            full_name: user.full_name,
-            user_type: user.user_type
-        },
-        access_token: accessToken,
-        onboarding_complete: onboardingComplete
-    });
+    res.status(200).json({ accessToken, refreshToken, user });
 
     next();
 });
