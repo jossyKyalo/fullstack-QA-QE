@@ -2,10 +2,10 @@ import { Request } from "express";
 
  
 export interface User {
-    id: string;
+    id: number;
     user_id: number,
     user_type: string;
-    name: string;
+    full_name: string;
     email: string;
     password?: string;  
     created_at?: Date;
