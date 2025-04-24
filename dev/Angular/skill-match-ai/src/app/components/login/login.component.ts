@@ -40,7 +40,11 @@ export class LoginComponent {
               this.router.navigate(['/users']);
               break;
             case 'job_seeker':
-              this.router.navigate(['/onboarding']);
+              if (res?.onboarding_complete) {
+                this.router.navigate(['/jobSeeker']);
+              } else {
+                this.router.navigate(['/onboarding']);
+              }
               break;
             case 'recruiter':
               this.router.navigate(['/recruiter']);

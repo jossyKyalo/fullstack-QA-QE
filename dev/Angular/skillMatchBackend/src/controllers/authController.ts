@@ -77,7 +77,16 @@ export const loginUser = asyncHandler(async (req: UserRequest, res: Response, ne
         res.status(401).json({ message: "Invalid email or password" });
         return;
     }
-
+    let onboardingComplete = false;
+    if (user.user_type === 'job_seeker') {
+        const jobSeekerQuery = await pool.query(
+            "SELECT onboarding_complete FROM jobseekers WHERE user_id = $1",
+            [user.user_id]
+        );
+        if (jobSeekerQuery.rows.length > 0) {
+            onboardingComplete = jobSeekerQuery.rows[0].onboarding_complete;
+        }
+    }
     // Generate JWT Token
     const { accessToken, refreshToken } = generateTokens(res, user.user_id, user.user_type);
 
@@ -92,7 +101,8 @@ export const loginUser = asyncHandler(async (req: UserRequest, res: Response, ne
             full_name: user.full_name,
             user_type: user.user_type
         },
-        access_token: accessToken
+        access_token: accessToken,
+        onboarding_complete: onboardingComplete
     });
 
     next();

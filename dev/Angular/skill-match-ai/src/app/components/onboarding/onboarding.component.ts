@@ -14,7 +14,7 @@ interface Skill {
 
 @Component({
   selector: 'app-onboarding',
-  imports:[CommonModule, FormsModule, ReactiveFormsModule, HttpClientModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, HttpClientModule],
   standalone: true,
   templateUrl: './onboarding.component.html',
   styleUrls: ['./onboarding.component.css']
@@ -44,7 +44,7 @@ export class OnboardingComponent implements OnInit {
     private fb: FormBuilder,
     private router: Router,
     private onboardingService: OnboardingService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.initForms();
@@ -126,12 +126,11 @@ export class OnboardingComponent implements OnInit {
     this.resumeUpload.nativeElement.value = '';
   }
 
-   
   searchSkills(): void {
     const searchTerm = this.skillSearchControl.value;
     if (searchTerm && searchTerm.length >= 2) {
       this.onboardingService.getSkillSuggestions(searchTerm).subscribe(skills => {
-        this.skillSearchResults = skills.filter(skill => 
+        this.skillSearchResults = skills.filter(skill =>
           !this.selectedSkills.some(s => s.skill_id === skill.skill_id)
         );
       });
@@ -139,7 +138,7 @@ export class OnboardingComponent implements OnInit {
       this.skillSearchResults = [];
     }
   }
-  
+
   addSkill(skill: Skill): void {
     this.selectedSkills.push({
       ...skill,
@@ -154,13 +153,52 @@ export class OnboardingComponent implements OnInit {
   }
 
   extractSkillsFromResume(file: File): void {
+    if (!file) {
+      console.error('No file provided for skill extraction');
+      return;
+    }
+
+    console.log('Extracting skills from resume file:', file.name);
+
     this.onboardingService.extractSkillsFromResume(file).subscribe(
-      extractedSkills => {
+      response => {
+        console.log('Raw skill extraction response:', response);
+
+        // Handle different possible response formats
+        let extractedSkills;
+
+        if (Array.isArray(response)) {
+          extractedSkills = response;
+        } else if (response && typeof response === 'object') {
+          // Try to find an array property in the response
+          const possibleArrayProps = ['data', 'skills', 'results', 'items'];
+          for (const prop of possibleArrayProps) {
+            if (Array.isArray(response[prop])) {
+              extractedSkills = response[prop];
+              break;
+            }
+          }
+        }
+
+        // If we still don't have an array, return to prevent errors
+        if (!Array.isArray(extractedSkills)) {
+          console.error('Could not find skill array in response:', response);
+          return;
+        }
+
+        console.log('Processed extractedSkills:', extractedSkills);
+
+        // Now safely process the skills
         extractedSkills.forEach(skill => {
           if (!this.selectedSkills.some(s => s.skill_id === skill.skill_id)) {
-            this.selectedSkills.push(skill);
+            this.selectedSkills.push({
+              ...skill,
+              proficiency: skill.proficiency || 50 // Set default proficiency if not provided
+            });
           }
         });
+
+        console.log('Updated selectedSkills:', this.selectedSkills);
       },
       error => {
         console.error('Error extracting skills:', error);
@@ -169,31 +207,57 @@ export class OnboardingComponent implements OnInit {
   }
 
   completeOnboarding(): void {
-    // Get the profile photo if it exists
-    let profilePhoto = null;
-    if (this.profilePhotoPreview && this.photoUpload?.nativeElement) {
-      // Extract the file from the element
-      profilePhoto = this.photoUpload.nativeElement.files[0];
+    const token = localStorage.getItem('auth_token');
+    if (!token) {
+      alert('Please log in to continue');
+      this.router.navigate(['/login']);
+      return;
     }
-  
-    const onboardingData = {
-      profile: this.profileForm.value,
-      skills: this.selectedSkills,
-      resume: this.resumeFile,
-      profilePhoto: profilePhoto,
-      preferences: this.preferencesForm.value
-    };
-    
-    console.log('Onboarding data:', onboardingData);
-    this.onboardingService.saveOnboardingData(onboardingData).subscribe(
-      (response) => {
-        console.log('Onboarding complete:', response);
-        this.router.navigate(['/jobSeeker']);
-      },
-      error => {
-        console.error('Error saving onboarding data:', error);
+
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const expirationTime = payload.exp * 1000;
+
+      if (Date.now() >= expirationTime) {
+        alert('Your session has expired. Please log in again.');
+        this.router.navigate(['/login']);
+        return;
       }
-    );
+      // Get the profile photo if it exists
+      let profilePhoto = null;
+      if (this.profilePhotoPreview && this.photoUpload?.nativeElement) {
+        // Extract the file from the element
+        profilePhoto = this.photoUpload.nativeElement.files[0];
+      }
+
+      const onboardingData = {
+        profile: this.profileForm.value,
+        skills: this.selectedSkills,
+        resume: this.resumeFile,
+        profilePhoto: profilePhoto,
+        preferences: this.preferencesForm.value
+      };
+
+      console.log('Onboarding data:', onboardingData);
+
+      // Log token before sending request
+      console.log('Token before API call:', localStorage.getItem('auth_token'));
+
+      this.onboardingService.saveOnboardingData(onboardingData).subscribe(
+        (response) => {
+          console.log('Onboarding complete:', response);
+          this.router.navigate(['/jobSeeker']);
+        },
+        error => {
+          console.error('Error checking token:', error);
+          alert('Authentication error. Please log in again.');
+          this.router.navigate(['/login']);
+        }
+      );
+    }catch (error) {
+      console.error('Error decoding or parsing token:', error);
+      alert('Invalid session token. Please log in again.');
+      this.router.navigate(['/login']);
+    }
   }
-  
 }

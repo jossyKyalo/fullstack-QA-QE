@@ -17,7 +17,7 @@ const generateTokens = (res, userId, role) => {
     }
     try {
         // Generate short-lived access token (15 mins)
-        const accessToken = jsonwebtoken_1.default.sign({ user_id: userId, user_type: role }, jwtSecret, { expiresIn: "15m" });
+        const accessToken = jsonwebtoken_1.default.sign({ user_id: userId, user_type: role }, jwtSecret, { expiresIn: "7d" });
         // Generate long-lived refresh token (30 days)
         const refreshToken = jsonwebtoken_1.default.sign({ userId }, refreshSecret, { expiresIn: "30d" });
         // Set access token as an HTTP-Only secure cookie
@@ -25,7 +25,7 @@ const generateTokens = (res, userId, role) => {
             httpOnly: true,
             secure: process.env.NODE_ENV !== "development", // Secure in production
             sameSite: "strict",
-            maxAge: 15 * 60 * 1000, // 15 minutes
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         });
         // Set refresh token as an HTTP-Only secure cookie
         res.cookie("refresh_token", refreshToken, {

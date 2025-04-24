@@ -15,18 +15,32 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createJobSeekerProfile = void 0;
 const db_config_1 = __importDefault(require("../config/db.config"));
 const createJobSeekerProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c, _d;
-    const { userId, headline, currentCompany, yearsExperience, remotePreference, preferredLocation, skills, preferences, } = req.body;
+    var _a, _b, _c, _d, _e, _f;
+    const userId = req.userId;
+    if (!userId) {
+        res.status(401).json({ error: "User not authenticated" });
+        return;
+    }
+    const { headline, currentCompany, yearsExperience, remotePreference, preferredLocation, skills, preferences, } = req.body;
     const files = req.files;
     const profilePhoto = (_a = files.profilePhoto) === null || _a === void 0 ? void 0 : _a[0];
     const resume = (_b = files.resume) === null || _b === void 0 ? void 0 : _b[0];
     const client = yield db_config_1.default.connect();
     try {
         yield client.query("BEGIN");
-        // 1. Insert into jobseekers
-        const jobseekerInsert = yield client.query(`INSERT INTO jobseekers (user_id, headline, current_company, years_experience, remote_preference, preferred_location, profile_picture, resume_document)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-       RETURNING jobseeker_id`, [
+        // 1. Insert/Update into jobseekers
+        const jobseekerInsert = yield client.query(`INSERT INTO jobseekers (user_id, headline, current_company, years_experience, remote_preference, preferred_location, profile_picture, resume_document, onboarding_complete)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, true)
+            ON CONFLICT (user_id) DO UPDATE SET
+                headline = EXCLUDED.headline,
+                current_company = EXCLUDED.current_company,
+                years_experience = EXCLUDED.years_experience,
+                remote_preference = EXCLUDED.remote_preference,
+                preferred_location = EXCLUDED.preferred_location,
+                profile_picture = EXCLUDED.profile_picture,
+                resume_document = EXCLUDED.resume_document,
+                onboarding_complete = true
+            RETURNING jobseeker_id`, [
             userId,
             headline,
             currentCompany,
@@ -36,38 +50,44 @@ const createJobSeekerProfile = (req, res) => __awaiter(void 0, void 0, void 0, f
             (profilePhoto === null || profilePhoto === void 0 ? void 0 : profilePhoto.buffer) || null,
             (resume === null || resume === void 0 ? void 0 : resume.buffer) || null,
         ]);
-        const jobseekerId = jobseekerInsert.rows[0].jobseeker_id;
-        // 2. Insert skills
-        for (const skill of skills) {
-            const skillName = (_c = skill.name) === null || _c === void 0 ? void 0 : _c.trim();
-            const category = ((_d = skill.category) === null || _d === void 0 ? void 0 : _d.trim()) || 'technical';
-            if (!skillName) {
-                console.warn(`Skipping invalid skill: ${JSON.stringify(skill)}`);
-                continue;
+        const jobseekerId = (_c = jobseekerInsert.rows[0]) === null || _c === void 0 ? void 0 : _c.jobseeker_id;
+        if (jobseekerId) {
+            // 2. Insert/Update skills (you might need to handle updates more carefully)
+            for (const skill of skills) {
+                const skillName = (_d = skill.name) === null || _d === void 0 ? void 0 : _d.trim();
+                const category = ((_e = skill.category) === null || _e === void 0 ? void 0 : _e.trim()) || 'technical';
+                if (!skillName)
+                    continue;
+                const skillRes = yield client.query(`INSERT INTO skills (skill_name, category)
+                    VALUES ($1, $2)
+                    ON CONFLICT (skill_name) DO UPDATE SET skill_name = EXCLUDED.skill_name
+                    RETURNING skill_id`, [skillName, category]);
+                const skillId = (_f = skillRes.rows[0]) === null || _f === void 0 ? void 0 : _f.skill_id;
+                if (skillId) {
+                    yield client.query(`INSERT INTO userskills (user_id, skill_id, proficiency_score)
+                        VALUES ($1, $2, $3)
+                        ON CONFLICT (user_id, skill_id) DO UPDATE SET proficiency_score = EXCLUDED.proficiency_score`, [userId, skillId, skill.proficiency || 50]);
+                }
             }
-            const skillRes = yield client.query(`INSERT INTO skills (skill_name, category)
-     VALUES ($1, $2)
-     ON CONFLICT (skill_name) DO UPDATE SET skill_name = EXCLUDED.skill_name
-     RETURNING skill_id`, [skillName, category]);
-            const skillId = skillRes.rows[0].skill_id;
-            yield client.query(`INSERT INTO userskills (user_id, skill_id, proficiency_score)
-     VALUES ($1, $2, $3)`, [userId, skillId, skill.proficiency || 50]);
-        }
-        // 3. Insert employment preferences
-        if ((preferences === null || preferences === void 0 ? void 0 : preferences.employmentTypes) && Array.isArray(preferences.employmentTypes)) {
-            for (const type of preferences.employmentTypes) {
-                yield client.query(`INSERT INTO jobseeker_employment_preferences (jobseeker_id, employment_type)
-                 VALUES ($1, $2)
-                 ON CONFLICT DO NOTHING`, [jobseekerId, type]);
+            // 3. Insert employment preferences (handle updates if needed)
+            yield client.query(`DELETE FROM jobseeker_employment_preferences WHERE jobseeker_id = $1`, [jobseekerId]);
+            if ((preferences === null || preferences === void 0 ? void 0 : preferences.employmentTypes) && Array.isArray(preferences.employmentTypes)) {
+                for (const type of preferences.employmentTypes) {
+                    yield client.query(`INSERT INTO jobseeker_employment_preferences (jobseeker_id, employment_type)
+                        VALUES ($1, $2)
+                        ON CONFLICT DO NOTHING`, [jobseekerId, type]);
+                }
             }
+            else {
+                console.warn('Employment preferences not provided or invalid.');
+            }
+            yield client.query("COMMIT");
+            res.status(201).json({ message: "Onboarding completed successfully" });
         }
         else {
-            console.warn('Employment preferences not provided or invalid.');
+            yield client.query("ROLLBACK");
+            res.status(500).json({ error: "Failed to create/update jobseeker profile ID" });
         }
-        // 4. Mark onboarding complete
-        yield client.query(`UPDATE jobseekers SET onboarding_complete = true WHERE jobseeker_id = $1`, [jobseekerId]);
-        yield client.query("COMMIT");
-        res.status(201).json({ message: "Onboarding completed successfully" });
     }
     catch (error) {
         yield client.query("ROLLBACK");

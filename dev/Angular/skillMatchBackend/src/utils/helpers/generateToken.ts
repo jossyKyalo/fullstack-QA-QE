@@ -18,7 +18,7 @@ export const generateTokens = (res: Response, userId: string, role: string) => {
 
     try {
         // Generate short-lived access token (15 mins)
-        const accessToken = jwt.sign({ user_id: userId, user_type: role }, jwtSecret, { expiresIn: "15m" });
+        const accessToken = jwt.sign({ user_id: userId, user_type: role }, jwtSecret, { expiresIn: "7d" });
 
         // Generate long-lived refresh token (30 days)
         const refreshToken = jwt.sign({ userId }, refreshSecret, { expiresIn: "30d" });
@@ -28,7 +28,7 @@ export const generateTokens = (res: Response, userId: string, role: string) => {
             httpOnly: true,
             secure: process.env.NODE_ENV !== "development", // Secure in production
             sameSite: "strict",
-            maxAge: 15 * 60 * 1000, // 15 minutes
+            maxAge: 7 * 24 *60 * 60 * 1000, // 7 days
         });
 
         // Set refresh token as an HTTP-Only secure cookie
