@@ -1,12 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import {trigger,transition,style, animate,state} from '@angular/animations';
 import { RouterLink } from '@angular/router';
-
+import { TermsPrivacyModalComponent } from '../terms-privacy-modal/terms-privacy-modal.component';
 @Component({
   selector: 'app-landing-page',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, TermsPrivacyModalComponent],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './landing-page.component.html',
   styleUrl: './landing-page.component.css',
   animations: [
@@ -26,6 +27,8 @@ import { RouterLink } from '@angular/router';
 
 export class LandingPageComponent {
   currentIndex: number = 0;
+  showModal = false;
+  modalType: 'terms' | 'privacy' = 'terms';
 
   testimonials = [
     {
@@ -73,7 +76,18 @@ export class LandingPageComponent {
       }, 0);
     }
   }
-
+  openModal(type: 'terms' | 'privacy') {
+    this.modalType = type;
+    this.showModal = true;
+    console.log('Opening modal:', type);
+    document.body.style.overflow = 'hidden';
+  }
+  
+  closeModal() {
+    this.showModal = false;
+    console.log('Closing modal');
+    document.body.style.overflow = 'auto';
+  }
   nextSlide() {
     this.currentIndex = (this.currentIndex + 1) % this.testimonials.length;
   }

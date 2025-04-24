@@ -6,8 +6,8 @@
     </div>
     <nav class="nav">
       <a href="#">Home</a>
-      <a [routerLink]="['/jobSeeker']">Find Jobs</a>
-      <a [routerLink]="['/recruiter']">Hire Talent</a>
+      <a [routerLink]="['/register']">Find Jobs</a>
+      <a [routerLink]="['/register']">Hire Talent</a>
     </nav>
     <div class="auth-buttons">
       <button class="login-btn" [routerLink]="['/login']">Login</button>
@@ -21,7 +21,7 @@
     <p>Efficiently connect the right talent to the right roles</p>
     <div class="action-buttons">
       <button class="get-started-btn" [routerLink]="['/register']">Get started</button>
-      <button class="learn-more-btn">Learn more</button>
+      <button class="learn-more-btn" (click)="openModal('privacy')">Learn more</button>
     </div>
   </main>
   
@@ -33,7 +33,7 @@
     [@slideAnimation]="i === currentIndex ? 'visible' : 'hidden'"
     [style.display]="i === currentIndex ? 'block' : 'none'">
       <div class="profile">
-        <img src="https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="{{ testimonial.name }}" />
+        <img src="avatar.png" alt="{{ testimonial.name }}" />
         <div class="info">
           <h3>{{ testimonial.name }}</h3>
           <p class="role">{{ testimonial.role }}</p>
@@ -72,14 +72,20 @@
     <div class="footer-right">
       <div class="quick-links">
         <h4>Quick Links</h4>
-        <a [routerLink]="['/jobSeeker']">Jobs</a>
+        <a [routerLink]="['/register']">Jobs</a>
         <a href="#">AI Chat</a>
         <a  [routerLink]="['/register']">Get started</a>
       </div>
       <div class="legal-links">
         <h4>© 2025 SkillMatch AI</h4>
-        <a href="#">Privacy Policy</a>
-        <a href="#">Terms of Service</a>
+        <a href="javascript:void(0)" (click)="openModal('privacy')">Privacy Policy</a>
+        <a href="javascript:void(0)" (click)="openModal('terms')">Terms of Service</a>
       </div>
     </div>
   </footer>
+<app-terms-privacy-modal 
+*ngIf="showModal"
+[showModal]="showModal" 
+[modalType]="modalType" 
+(closeModal)="closeModal()">
+</app-terms-privacy-modal>
