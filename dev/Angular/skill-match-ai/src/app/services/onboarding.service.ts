@@ -13,18 +13,17 @@ export class OnboardingService {
   constructor(private http: HttpClient) { }
   
   saveOnboardingData(data: any): Observable<any> {
-    const token = localStorage.getItem('auth_token');
+    const token = localStorage.getItem('access_token');   
     console.log('Actual token value:', token);
-    
-    // Use FormData for mixed content
+  
+     
     const formData = this.prepareFormData(data);
-    
-    // Manual headers to ensure they're set correctly
-    const options = {
-      headers: new HttpHeaders().set('Authorization', `Bearer ${token}`)
-    };
-    
-    return this.http.post(`${this.apiUrl}/onboarding`, formData, options)
+  
+    const headers = new HttpHeaders({
+      'Authorization': token ? `Bearer ${token}` : ''  // Add token to headers if available
+    });
+  
+    return this.http.post(`${this.apiUrl}/onboarding`, formData, { headers })
       .pipe(
         tap(response => console.log('Onboarding API response:', response)),
         catchError(error => {
@@ -36,6 +35,7 @@ export class OnboardingService {
         })
       );
   }
+  
    
   getSkillSuggestions(searchTerm: string): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/skills/search?term=${searchTerm}`)
