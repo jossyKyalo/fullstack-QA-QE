@@ -8,9 +8,13 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const authenticateToken = (req, res, next) => {
     try {
         const authHeader = req.headers['authorization'];
-        const token = authHeader && authHeader.split(' ')[1];
-        if (!token) {
+        if (!authHeader) {
             res.status(401).json({ message: 'Authentication token is required' });
+            return;
+        }
+        const token = authHeader.split(' ')[1];
+        if (!token) {
+            res.status(401).json({ message: 'Invalid token format' });
             return;
         }
         jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET, (err, decoded) => {
@@ -19,8 +23,6 @@ const authenticateToken = (req, res, next) => {
                 return;
             }
             const payload = decoded;
-            console.log("Decoded JWT payload:", payload);
-            // Add user info to request
             req.userId = payload.id;
             req.userType = payload.user_type;
             next();
@@ -28,7 +30,8 @@ const authenticateToken = (req, res, next) => {
     }
     catch (error) {
         console.error('Authentication error:', error);
-        res.status(401).json({ message: 'Invalid or expired token' });
+        res.status(401).json({ message: 'Authentication token error' });
+        return;
     }
 };
 exports.authenticateToken = authenticateToken;
