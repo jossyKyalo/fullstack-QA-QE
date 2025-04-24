@@ -8,12 +8,12 @@ import {
   searchCandidates,
   contactCandidate
 } from '../controllers/recruiterController';
-import { authenticateToken, isRecruiter } from '../middlewares/authMiddleware';
+import { protect } from '../middlewares/auth/protect';
 
 const router = express.Router();
  
-router.use(authenticateToken);
-router.use(isRecruiter);
+router.use(protect);
+ 
 
 // Recruiter dashboard routes
 router.get('/profile/:id', getRecruiterProfile);

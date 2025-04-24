@@ -5,10 +5,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const recruiterController_1 = require("../controllers/recruiterController");
-const authMiddleware_1 = require("../middlewares/authMiddleware");
+const protect_1 = require("../middlewares/auth/protect");
 const router = express_1.default.Router();
-router.use(authMiddleware_1.authenticateToken);
-router.use(authMiddleware_1.isRecruiter);
+router.use(protect_1.protect);
 // Recruiter dashboard routes
 router.get('/profile/:id', recruiterController_1.getRecruiterProfile);
 router.get('/metrics/:id', recruiterController_1.getRecruiterMetrics);
