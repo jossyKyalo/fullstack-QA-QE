@@ -13,10 +13,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createJobSeekerProfile = void 0;
+require("../utils/types/customRequest");
 const db_config_1 = __importDefault(require("../config/db.config"));
 const createJobSeekerProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b, _c, _d, _e, _f;
-    const userId = req.userId;
+    const user = req.user;
+    const userId = user === null || user === void 0 ? void 0 : user.user_id;
     if (!userId) {
         res.status(401).json({ error: "User not authenticated" });
         return;

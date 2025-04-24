@@ -42,7 +42,12 @@ exports.registerUser = (0, asyncHandler_1.default)((req, res, next) => __awaiter
         ]);
     }
     // Generate JWT Token
-    (0, generateToken_1.generateTokens)(newUserId, user_type);
+    (0, generateToken_1.generateTokens)({
+        user_id: newUserId,
+        user_type: user_type,
+        email: newUser.email,
+        full_name: newUser.full_name,
+    });
     res.status(201).json({
         message: "User registered successfully",
         user: newUser
@@ -74,7 +79,12 @@ exports.loginUser = (0, asyncHandler_1.default)((req, res, next) => __awaiter(vo
         }
     }
     // Generate JWT Token
-    const { accessToken, refreshToken } = (0, generateToken_1.generateTokens)(user.user_id, user.user_type);
+    const { accessToken, refreshToken } = (0, generateToken_1.generateTokens)({
+        user_id: user.user_id,
+        user_type: user.user_type,
+        email: user.email,
+        full_name: user.full_name,
+    });
     // Update last login timestamp
     yield db_config_1.default.query("UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE user_id = $1", [user.user_id]);
     res.status(200).json({ accessToken, refreshToken, user });

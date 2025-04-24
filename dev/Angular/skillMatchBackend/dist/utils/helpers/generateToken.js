@@ -7,19 +7,17 @@ exports.generateTokens = void 0;
 const dotenv_1 = __importDefault(require("dotenv"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 dotenv_1.default.config();
-console.log("JWT_SECRET:", process.env.JWT_SECRET);
-console.log("REFRESH_TOKEN_SECRET:", process.env.REFRESH_TOKEN_SECRET);
-const generateTokens = (userId, role) => {
+const generateTokens = (user) => {
     const jwtSecret = process.env.JWT_SECRET;
     const refreshSecret = process.env.REFRESH_TOKEN_SECRET;
     if (!jwtSecret || !refreshSecret) {
         throw new Error("JWT_SECRET or REFRESH_TOKEN_SECRET is not defined in environment variables");
     }
     try {
-        // Generate access token (e.g., 15 mins or 7 days for testing)
-        const accessToken = jsonwebtoken_1.default.sign({ user_id: userId, user_type: role }, jwtSecret, { expiresIn: "7d" });
-        // Generate refresh token (e.g., 30 days)
-        const refreshToken = jsonwebtoken_1.default.sign({ user_id: userId }, refreshSecret, { expiresIn: "30d" });
+        const accessToken = jsonwebtoken_1.default.sign({ user_id: user.user_id.toString(), user_type: user.user_type, email: user.email, full_name: user.full_name }, // user_id as string
+        jwtSecret, { expiresIn: "7d" });
+        const refreshToken = jsonwebtoken_1.default.sign({ user_id: user.user_id.toString() }, // user_id as string
+        refreshSecret, { expiresIn: "30d" });
         return { accessToken, refreshToken };
     }
     catch (error) {

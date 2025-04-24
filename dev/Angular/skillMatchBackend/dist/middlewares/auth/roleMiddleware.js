@@ -29,6 +29,3 @@ exports.roleGuard = roleGuard;
 exports.jobSeekerGuard = (0, exports.roleGuard)(["job_seeker"]);
 exports.recruiterGuard = (0, exports.roleGuard)(["recruiter"]);
 exports.adminGuard = (0, exports.roleGuard)(["admin"]);
-// //combined guards  
-// export const staffGuard = roleGuard(["Admin", "Librarian"]);
-// export const anyUserGuard = roleGuard(["Admin", "Librarian", "Borrower"]);
