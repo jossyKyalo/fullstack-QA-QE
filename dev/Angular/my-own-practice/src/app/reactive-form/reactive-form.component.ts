@@ -17,5 +17,9 @@ export class ReactiveFormComponent {
     zipCode: new FormControl(),
     isTermsAgreed: new FormControl(false)
   })
+  onUserSave(){
+    const formValue= this.userForm.value;
+    debugger;
+  }
 
 }

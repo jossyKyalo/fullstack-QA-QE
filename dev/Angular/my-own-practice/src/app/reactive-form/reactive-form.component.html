@@ -1,5 +1,5 @@
 <div class="container">
-<form class="row g-3 needs-validation"  [formGroup]="userForm">
+<form class="row g-3 needs-validation" (ngSubmit)="onUserSave()" [formGroup]="userForm">
     <div class="col-md-4">
       <label for="validationCustom01" class="form-label">First name</label>
       <input type="text" formControlName="fName" class="form-control" id="validationCustom01" value="Mark" required>
