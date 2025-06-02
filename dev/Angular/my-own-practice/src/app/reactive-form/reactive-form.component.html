@@ -3,16 +3,28 @@
     <div class="col-md-4">
       <label for="validationCustom01" class="form-label">First name</label>
       <input type="text" formControlName="fName" class="form-control" id="validationCustom01" value="Mark" required>
-      <div class="valid-feedback">
-        Looks good!
+      <div class="text-danger">
+        @if(userForm.controls['fName'].errors?.['required']&&userForm.controls['fName'].touched) {
+            <span>This is Required</span>
+        }
+        
       </div>
     </div>
     <div class="col-md-4">
       <label for="validationCustom02" class="form-label">Last name</label>
       <input type="text" formControlName="lName" class="form-control" id="validationCustom02" value="Otto" required>
-      <div class="valid-feedback">
-        Looks good!
+      @if (userForm.controls['lName'].touched) {
+
+      <div class="text-danger">
+        @if(userForm.controls['lName'].errors?.['required']&&userForm.controls['lName'].touched) {
+           <span>This is Required</span>
+          
+        }
+        @if(userForm.controls['lName'].errors?.['minlength']&&userForm.controls['lName'].touched) {
+            <span>Min 5 char needed</span>
+        }
       </div>
+    }
     </div>
     <div class="col-md-4">
       <label for="validationCustomUsername" class="form-label">Username</label>
