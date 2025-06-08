@@ -11,6 +11,7 @@ import { GetApiComponent } from './get-api/get-api.component';
 import { PostApiComponent } from './post-api/post-api.component';
 import { ResourceApiComponent } from './resource-api/resource-api.component';
 import { CustomerComponent } from './customer/customer.component';
+import { LifeCycleComponent } from './life-cycle/life-cycle.component';
 
 export const routes: Routes = [
     //default route
@@ -66,6 +67,10 @@ export const routes: Routes = [
     {
         path:'customer',
         component: CustomerComponent
+    },
+    {
+        path: 'life-cycle',
+        component: LifeCycleComponent
     }
 
 ];
