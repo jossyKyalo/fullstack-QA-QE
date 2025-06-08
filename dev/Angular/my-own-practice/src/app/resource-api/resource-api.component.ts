@@ -1,9 +1,9 @@
 import { Component, resource } from '@angular/core';
-import { JsonPipe } from '@angular/common';
+ 
 
 @Component({
   selector: 'app-resource-api',
-  imports: [JsonPipe],
+  imports: [ ],
   templateUrl: './resource-api.component.html',
   styleUrl: './resource-api.component.css'
 })
