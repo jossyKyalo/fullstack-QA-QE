@@ -1,11 +1,21 @@
-import { Component } from '@angular/core';
+import { Component, resource } from '@angular/core';
+import { JsonPipe } from '@angular/common';
 
 @Component({
   selector: 'app-resource-api',
-  imports: [],
+  imports: [JsonPipe],
   templateUrl: './resource-api.component.html',
   styleUrl: './resource-api.component.css'
 })
 export class ResourceApiComponent {
+  userList = resource({
+    loader: () => {
+      return fetch('https://jsonplaceholder.typicode.com/users')
+        .then((response) => response.json() as Promise<any[]>)
+    }
+  })
+  realodData(){
+    this.userList.reload();
+  }
 
 }
