@@ -1,0 +1,67 @@
+<div class="row">
+    <div class="col-8">
+        <div class="card">
+            <div class="card-header bg-warning">
+                <h4>Customer List</h4>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Customer ID</th>
+                            <th>Name</th>
+                            <th>City</th>
+                            <th>Mobile No</th>
+                            <th>Email</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let customer of customerList; let i= index">
+                            <td>{{i+1}}</td>
+                            <td>{{customer.customerName}}</td>
+                            <td>{{customer.customerCity}}</td>
+                            <td>{{customer.mobileNo}}</td>
+                            <td>{{customer.email}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="card">
+            <div class="card-header bg-warning">
+                <h4>New Customer Form</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-6">
+                        <label for="name">Name</label>
+                        <input type="text" [(ngModel)]= "customerObj.customerName" >
+                    </div>
+                     <div class="col-6">
+                        <label for="name">City</label>
+                        <input type="text" [(ngModel)]= "customerObj.customerCity" >
+                    </div>
+                     <div class="col-6">
+                        <label for="name">Mobile No</label>
+                        <input type="text" [(ngModel)]= "customerObj.mobileNo" >
+                    </div>
+                     <div class="col-6">
+                        <label for="name">Email</label>
+                        <input type="text" [(ngModel)]= "customerObj.email">
+                    </div>
+                </div>
+                <div class="row pt-2">
+                    <div class="col-6 text-center">
+                        <button class="btn btn-secondary">Reset</button>
+                    </div>
+                    <div class="col-6 text-center">
+                        <button class="btn btn-success" (click)="onSaveCustomer()">Save Customer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
