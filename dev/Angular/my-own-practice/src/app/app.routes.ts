@@ -12,6 +12,7 @@ import { PostApiComponent } from './post-api/post-api.component';
 import { ResourceApiComponent } from './resource-api/resource-api.component';
 import { CustomerComponent } from './customer/customer.component';
 import { LifeCycleComponent } from './life-cycle/life-cycle.component';
+import { NgForComponent } from './ng-for/ng-for.component';
 
 export const routes: Routes = [
     //default route
@@ -31,6 +32,10 @@ export const routes: Routes = [
     {
         path: 'ng-style',
         component: NgStyleComponent
+    },
+    {
+        path: 'ng-for',
+        component: NgForComponent
     },
     {
         path: 'control-flow',
