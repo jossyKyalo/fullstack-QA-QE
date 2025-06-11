@@ -1,3 +1,8 @@
 <div class="col-4">
     <button class="btn btn-success" (click)="getAllCars()">Get All Cars</button>
 </div>
+<div class="row">
+    <div class="col-12 text-center">
+        <app-tabs [tabs]="['Car List', 'Car Form']" (onTabClicked)="onTabChange($event)"></app-tabs>
+    </div>
+</div>

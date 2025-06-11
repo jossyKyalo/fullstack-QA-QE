@@ -1,9 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, inject } from '@angular/core';
+import { TabsComponent } from "../reusable/tabs/tabs.component";
 
 @Component({
   selector: 'app-post-api',
-  imports: [],
+  imports: [TabsComponent],
   templateUrl: './post-api.component.html',
   styleUrl: './post-api.component.css'
 })
@@ -20,6 +21,9 @@ export class PostApiComponent {
     'regNo': ""
   }
   http = inject(HttpClient);
+  onTabChange(tab: string) {
+    console.log("Tab changed to: " + tab);
+  }
   getAllCars() {
     this.http.get('https://freeapi.miniprojectideas.com/api/CarRentalApp/GetCars').subscribe((res: any) => {
       this.carList = res.data;
