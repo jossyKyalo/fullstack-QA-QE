@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, inject } from '@angular/core';
 import { TabsComponent } from "../reusable/tabs/tabs.component";
+import { Car, ICarList } from '../model/car';
 
 @Component({
   selector: 'app-post-api',
@@ -9,17 +10,8 @@ import { TabsComponent } from "../reusable/tabs/tabs.component";
   styleUrl: './post-api.component.css'
 })
 export class PostApiComponent {
-  carList: any[] = [];
-  carObj: any = {
-    "carId": "",
-    "brand": "",
-    "model": "",
-    "year": "",
-    'color': "",
-    'dailyRate':"" ,
-    'carImage': "",
-    'regNo': ""
-  }
+  carList: ICarList[] = [];
+  carObj:  Car= new Car();
   http = inject(HttpClient);
   onTabChange(tab: string) {
     console.log("Tab changed to: " + tab);
@@ -34,6 +26,7 @@ export class PostApiComponent {
       if (res.status == 200) {
         alert("Car added successfully");
         this.getAllCars();
+        this.carObj = new Car();  
       } else {
         alert("Error adding car");
       }
