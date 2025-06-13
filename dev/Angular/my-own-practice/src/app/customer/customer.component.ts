@@ -3,12 +3,11 @@ import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CustomerService } from '../services/customer.service';
-import { ProgressbarComponent } from "../reusable/progressbar/progressbar.component";
 import { TabsComponent } from "../reusable/tabs/tabs.component";
 
 @Component({
   selector: 'app-customer',
-  imports: [FormsModule, CommonModule, ProgressbarComponent, TabsComponent],
+  imports: [FormsModule, CommonModule, TabsComponent],
   standalone: true,
   templateUrl: './customer.component.html',
   styleUrl: './customer.component.css'
