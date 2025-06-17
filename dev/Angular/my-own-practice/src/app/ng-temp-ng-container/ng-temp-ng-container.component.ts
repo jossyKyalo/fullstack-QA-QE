@@ -9,11 +9,17 @@ import { Component } from '@angular/core';
 })
 export class NgTempNgContainerComponent {
   employeeArray: any[]=[
-    {empId: 121, name:'AAA', city:'', contactNo:'111111', attendance: 90},
-    {empId: 122, name:'BBB', city:'Nagpur', contactNo:'222222', attendance: 30},
-    {empId: 123, name:'CCC', city:'Jaipur', contactNo:'333333', attendance: 70},
-    {empId: 124, name:'DDD', city:'Mumbai', contactNo:'444444', attendance: 25},
-    {empId: 125, name:null, city:'Thune', contactNo:'555555', attendance: 92} 
+    {empId: 121, isActive:false, ename:'AAA', city:'', contactNo:'111111', attendance: 90},
+    {empId: 122, isActive:true, name:'BBB', city:'Nagpur', contactNo:'222222', attendance: 30},
+    {empId: 123, isActive:false,name:'CCC', city:'Jaipur', contactNo:'333333', attendance: 70},
+    {empId: 124, isActive:false,name:'DDD', city:'Mumbai', contactNo:'444444', attendance: 25},
+    {empId: 125, isActive:true,name:null, city:'Thune', contactNo:'555555', attendance: 92} 
   ]
+  isLoader: boolean = true;
+  constructor(){
+    setTimeout(()=>{
+      this.isLoader = false;
+    }, 3000);
+  }
 
 }

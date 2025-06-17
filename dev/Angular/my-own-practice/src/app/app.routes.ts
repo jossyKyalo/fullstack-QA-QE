@@ -89,7 +89,7 @@ export const routes: Routes = [
                 component: LifeCycleComponent
             },
             {
-                path: 'ng-temp-containr',
+                path: 'ng-temp-container',
                 component: NgTempNgContainerComponent
             }
 

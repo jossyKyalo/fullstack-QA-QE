@@ -16,7 +16,7 @@ export class LoginComponent {
   router= inject(Router);
   onLogin(){
     if (this.loginObj.email === "admin@gmail.com" && this.loginObj.password === "123Admin") {
-       this.router.navigateByUrl('dataBinding/');
+       this.router.navigateByUrl('dataBinding');
     }else{
       alert("Invalid credentials");
     }
