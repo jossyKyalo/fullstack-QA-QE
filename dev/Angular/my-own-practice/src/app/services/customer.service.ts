@@ -7,7 +7,7 @@ import { Subject } from 'rxjs';
   providedIn: 'root'
 })
 export class CustomerService {
-  tokenExprired$: Subject<boolean> = new Subject<boolean>();
+  tokenExpired$: Subject<boolean> = new Subject<boolean>();
   tokenReceived$: Subject<boolean> = new Subject<boolean>();
   apiUrl = "https://freeapi.miniprojectideas.com/api/CarRentalApp/";
 
